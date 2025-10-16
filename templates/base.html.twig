@@ -43,14 +43,14 @@
         }
 
         a {
-            color: #38bdf8;
+            color: var(--secondary-color);
             font-weight: 600;
             text-decoration: none;
             transition: color 0.2s ease-in-out;
         }
 
         a:hover {
-            color: #0ea5e9;
+            color: var(--primary-color);
             text-decoration: underline;
         }
 
@@ -86,18 +86,6 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
-        }
-
-        .btn-secondary {
-            background-color: #334155;
-            color: var(--text-light);
-            font-weight: 600;
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #475569;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .card {
@@ -155,7 +143,53 @@
             color: var(--text-muted);
             font-size: 0.95rem;
         }
-    </style>
+
+        /* --- Ajustes para mejorar contraste en textos oscuros --- */
+
+        /* Subtítulos y textos "muted" */
+        .text-muted {
+            color: var(--text-light) !important;
+            opacity: 0.8;
+        }
+
+        /* Contenido principal de las noticias */
+        .news-content {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Comentarios */
+        .comment p {
+            color: var(--text-light);
+        }
+
+        /* Autor y firma */
+        .card-body small,
+        .comment small {
+            color: var(--text-muted);
+        }
+
+        /* Resaltar autores o iconos de persona */
+        .comment strong,
+        small i.bi-person {
+            color: var(--secondary-color) !important;
+        }
+        /* Dropdown del usuario logueado en navbar oscuro */
+.navbar .dropdown-menu {
+    background-color: var(--card-bg);
+}
+
+.navbar .dropdown-menu .dropdown-item {
+    color: var(--text-light) !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus {
+    background-color: var(--primary-color);
+    color: var(--text-strong) !important;
+}
+        </style>
     {% endblock %}
 </head>
 <body>
