@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro - GameNews{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">
+                    <i class="bi bi-person-plus"></i> Crear Cuenta
+                </h2>
+
+                {{ form_start(registrationForm) }}
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.email) }}
+                        {{ form_widget(registrationForm.email) }}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.username) }}
+                        {{ form_widget(registrationForm.username) }}
+                        {{ form_errors(registrationForm.username) }}
+                        <small class="form-text text-muted">Entre 3 y 20 caracteres. Solo letras, números, guiones y guiones bajos.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword.first) }}
+                        {{ form_widget(registrationForm.plainPassword.first) }}
+                        {{ form_errors(registrationForm.plainPassword.first) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword.second) }}
+                        {{ form_widget(registrationForm.plainPassword.second) }}
+                        {{ form_errors(registrationForm.plainPassword.second) }}
+                        <small class="form-text text-muted">Mínimo 8 caracteres, debe incluir mayúsculas, minúsculas y números.</small>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form_widget(registrationForm.agreeTerms) }}
+                        {{ form_label(registrationForm.agreeTerms) }}
+                        {{ form_errors(registrationForm.agreeTerms) }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="bi bi-person-plus"></i> Registrarse
+                    </button>
+
+                    <div class="text-center">
+                        <p class="mb-0">¿Ya tienes cuenta? <a href="{{ path('app_login') }}" class="text-decoration-none">Inicia sesión aquí</a></p>
+                    </div>
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

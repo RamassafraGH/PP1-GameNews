@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Noticia - GameNews{% endblock %}
+
+{% block body %}
+<div class="mb-3">
+    <a href="{{ path('app_admin_news_index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title mb-4"><i class="bi bi-plus-lg"></i> Crear Nueva Noticia</h3>
+
+        {{ form_start(newsForm) }}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        {{ form_label(newsForm.title) }}
+                        {{ form_widget(newsForm.title) }}
+                        {{ form_errors(newsForm.title) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(newsForm.subtitle) }}
+                        {{ form_widget(newsForm.subtitle) }}
+                        {{ form_errors(newsForm.subtitle) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(newsForm.body) }}
+                        {{ form_widget(newsForm.body) }}
+                        {{ form_errors(newsForm.body) }}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form_label(newsForm.status) }}
+                        {{ form_widget(newsForm.status) }}
+                        {{ form_errors(newsForm.status) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(newsForm.featuredImageFile) }}
+                        {{ form_widget(newsForm.featuredImageFile) }}
+                        {{ form_errors(newsForm.featuredImageFile) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(newsForm.categories) }}
+                        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #444; padding: 10px; border-radius: 5px;">
+                            {{ form_widget(newsForm.categories) }}
+                        </div>
+                        {{ form_errors(newsForm.categories) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(newsForm.tags) }}
+                        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #444; padding: 10px; border-radius: 5px;">
+                            {{ form_widget(newsForm.tags) }}
+                        </div>
+                        {{ form_errors(newsForm.tags) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Crear Noticia
+                </button>
+                <a href="{{ path('app_admin_news_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </a>
+            </div>
+        {{ form_end(newsForm) }}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panel de Administración - GameNews{% endblock %}
+
+{% block body %}
+<h1 class="mb-4"><i class="bi bi-speedometer2"></i> Panel de Administración</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-newspaper" style="font-size: 3rem; color: var(--primary-color);"></i>
+                <h3 class="mt-3">{{ publishedNews }}</h3>
+                <p class="text-muted">Noticias Publicadas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-people" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                <h3 class="mt-3">{{ totalUsers }}</h3>
+                <p class="text-muted">Usuarios Registrados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-chat-dots" style="font-size: 3rem; color: #10b981;"></i>
+                <h3 class="mt-3">{{ totalComments }}</h3>
+                <p class="text-muted">Comentarios</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                <h3 class="mt-3">{{ pendingComments }}</h3>
+                <p class="text-muted">Pendientes de Moderación</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <a href="{{ path('app_admin_news_index') }}" class="card text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-text" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Gestión de Noticias</h5>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="{{ path('app_admin_category_index') }}" class="card text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-folder" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Editar Categorías</h5>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="{{ path('app_admin_tag_index') }}" class="card text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-tags" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Editar Etiquetas</h5>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title"><i class="bi bi-clock-history"></i> Actividad Reciente</h4>
+        <hr>
+        
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Noticia</th>
+                        <th>Autor</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for news in recentNews %}
+                        <tr>
+                            <td>{{ news.title }}</td>
+                            <td>{{ news.author.username }}</td>
+                            <td>
+                                {% if news.status == 'published' %}
+                                    <span class="badge bg-success">Publicado</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Borrador</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ news.createdAt|date('d/m/Y H:i') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No hay actividad reciente</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

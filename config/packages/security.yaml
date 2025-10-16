@@ -20,8 +20,15 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                default_target_path: app_home
             logout:
                 path: app_logout
+                target: app_home
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                always_remember_me: true
                 # where to redirect after logout
                 # target: app_any_route
 
@@ -34,8 +41,13 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/editor, roles: ROLE_EDITOR }
+        - { path: ^/perfil, roles: ROLE_USER }
+
+    role_hierarchy:
+        ROLE_EDITOR: ROLE_USER
+        ROLE_ADMIN: [ROLE_EDITOR, ROLE_USER]
 
 when@test:
     security:

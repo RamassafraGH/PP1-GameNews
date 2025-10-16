@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Noticias - GameNews{% endblock %}
+
+{% block body %}
+<h1 class="mb-4"><i class="bi bi-newspaper"></i> Noticias de Videojuegos</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-search"></i> Buscar Noticias</h5>
+        {{ form_start(searchForm, {'method': 'GET'}) }}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    {{ form_widget(searchForm.query) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_widget(searchForm.category) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_widget(searchForm.tag) }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-5">
+                    {{ form_label(searchForm.dateFrom) }}
+                    {{ form_widget(searchForm.dateFrom) }}
+                </div>
+                <div class="col-md-5">
+                    {{ form_label(searchForm.dateTo) }}
+                    {{ form_widget(searchForm.dateTo) }}
+                </div>
+            </div>
+        {{ form_end(searchForm) }}
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for news in pagination %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                {% if news.featuredImage %}
+                    <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top news-card-img" alt="{{ news.title }}">
+                {% else %}
+                    <div class="card-img-top news-card-img bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #666;"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    {% for category in news.categories %}
+                        <span class="category-badge">{{ category.name }}</span>
+                    {% endfor %}
+                    
+                    <h5 class="card-title mt-2">{{ news.title }}</h5>
+                    <p class="card-text text-muted">{{ news.subtitle|default('') }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> {{ news.author.username }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y') }}
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="rating-stars">
+                            {% if news.averageRating %}
+                                {% for i in 1..5 %}
+                                    <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}"></i>
+                                {% endfor %}
+                                <small>({{ news.ratingCount }})</small>
+                            {% else %}
+                                <small class="text-muted">Sin valoraciones</small>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-eye"></i> {{ news.viewCount }}
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="btn btn-primary w-100">
+                        Leer más <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No se encontraron noticias.
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mt-4">
+    {{ knp_pagination_render(pagination) }}
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mi Perfil - GameNews{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if app.user.profileImage %}
+                    <img src="{{ asset('uploads/profiles/' ~ app.user.profileImage) }}" alt="Perfil" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
+                        <i class="bi bi-person-fill" style="font-size: 4rem; color: #999;"></i>
+                    </div>
+                {% endif %}
+                
+                <h4>{{ app.user.username }}</h4>
+                <p class="text-muted">{{ app.user.email }}</p>
+                
+                <a href="{{ path('app_profile_edit') }}" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-pencil"></i> Editar Perfil
+                </a>
+                
+                <form method="post" action="{{ path('app_profile_subscribe_newsletter') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('subscribe_newsletter') }}">
+                    <button type="submit" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-envelope"></i> 
+                        {{ app.user.isSubscribedToNewsletter ? 'Desuscribirse' : 'Suscribirse' }} al Boletín
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle"></i> Información</h5>
+                <hr>
+                <p><strong>Miembro desde:</strong><br>{{ app.user.createdAt|date('d/m/Y') }}</p>
+                <p><strong>Estado:</strong><br>
+                    {% if app.user.isActive %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                    {% endif %}
+                </p>
+                <p><strong>Boletín:</strong><br>
+                    {% if app.user.isSubscribedToNewsletter %}
+                        <span class="badge bg-info">Suscrito</span>
+                    {% else %}
+                        <span class="badge bg-secondary">No suscrito</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4"><i class="bi bi-activity"></i> Actividad Reciente</h4>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Próximamente podrás ver tus comentarios, valoraciones y más.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
