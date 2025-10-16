@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251016053814 extends AbstractMigration
+final class Version20251016151955 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -29,6 +29,7 @@ final class Version20251016053814 extends AbstractMigration
         $this->addSql('CREATE TABLE news_rating (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, news_id INT NOT NULL, rating INT NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_5420E556A76ED395 (user_id), INDEX IDX_5420E556B5A459A0 (news_id), UNIQUE INDEX user_news_unique (user_id, news_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE report (id INT AUTO_INCREMENT NOT NULL, reporter_id INT NOT NULL, comment_id INT DEFAULT NULL, reason VARCHAR(100) NOT NULL, description LONGTEXT NOT NULL, status VARCHAR(50) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', resolved_at DATETIME DEFAULT NULL, INDEX IDX_C42F7784E1CFE6F5 (reporter_id), INDEX IDX_C42F7784F8697D13 (comment_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE tag (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(100) NOT NULL, description LONGTEXT DEFAULT NULL, synonyms LONGTEXT DEFAULT NULL, slug VARCHAR(120) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', UNIQUE INDEX UNIQ_389B7835E237E06 (name), UNIQUE INDEX UNIQ_389B783989D9B62 (slug), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE `user` (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(180) NOT NULL, username VARCHAR(50) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, profile_image VARCHAR(255) DEFAULT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', last_login_at DATETIME DEFAULT NULL, is_active TINYINT(1) NOT NULL, is_subscribed_to_newsletter TINYINT(1) NOT NULL, failed_login_attempts INT DEFAULT NULL, blocked_until DATETIME DEFAULT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), UNIQUE INDEX UNIQ_8D93D649F85E0677 (username), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_9474526CF675F31B FOREIGN KEY (author_id) REFERENCES `user` (id)');
         $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_9474526CB5A459A0 FOREIGN KEY (news_id) REFERENCES news (id)');
         $this->addSql('ALTER TABLE comment_vote ADD CONSTRAINT FK_7C262788A76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
@@ -42,9 +43,6 @@ final class Version20251016053814 extends AbstractMigration
         $this->addSql('ALTER TABLE news_rating ADD CONSTRAINT FK_5420E556B5A459A0 FOREIGN KEY (news_id) REFERENCES news (id)');
         $this->addSql('ALTER TABLE report ADD CONSTRAINT FK_C42F7784E1CFE6F5 FOREIGN KEY (reporter_id) REFERENCES `user` (id)');
         $this->addSql('ALTER TABLE report ADD CONSTRAINT FK_C42F7784F8697D13 FOREIGN KEY (comment_id) REFERENCES comment (id)');
-        $this->addSql('ALTER TABLE user ADD email VARCHAR(180) NOT NULL, ADD profile_image VARCHAR(255) DEFAULT NULL, ADD created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD last_login_at DATETIME DEFAULT NULL, ADD is_active TINYINT(1) NOT NULL, ADD is_subscribed_to_newsletter TINYINT(1) NOT NULL, ADD failed_login_attempts INT DEFAULT NULL, ADD blocked_until DATETIME DEFAULT NULL, CHANGE username username VARCHAR(50) NOT NULL');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON user (email)');
-        $this->addSql('ALTER TABLE user RENAME INDEX uniq_identifier_username TO UNIQ_8D93D649F85E0677');
     }
 
     public function down(Schema $schema): void
@@ -72,8 +70,6 @@ final class Version20251016053814 extends AbstractMigration
         $this->addSql('DROP TABLE news_rating');
         $this->addSql('DROP TABLE report');
         $this->addSql('DROP TABLE tag');
-        $this->addSql('DROP INDEX UNIQ_8D93D649E7927C74 ON `user`');
-        $this->addSql('ALTER TABLE `user` DROP email, DROP profile_image, DROP created_at, DROP last_login_at, DROP is_active, DROP is_subscribed_to_newsletter, DROP failed_login_attempts, DROP blocked_until, CHANGE username username VARCHAR(180) NOT NULL');
-        $this->addSql('ALTER TABLE `user` RENAME INDEX uniq_8d93d649f85e0677 TO UNIQ_IDENTIFIER_USERNAME');
+        $this->addSql('DROP TABLE `user`');
     }
 }

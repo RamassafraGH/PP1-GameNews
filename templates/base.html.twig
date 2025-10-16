@@ -8,77 +8,154 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     {% block stylesheets %}
         <style>
-            :root {
-                --primary-color: #7c3aed;
-                --secondary-color: #2dd4bf;
-                --dark-bg: #1a1a2e;
-                --card-bg: #16213e;
-            }
-            
-            body {
-                background-color: #0f0f23;
-                color: #e0e0e0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-            
-            .navbar {
-                background: linear-gradient(135deg, var(--dark-bg) 0%, #16213e 100%);
-                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            }
-            
-            .navbar-brand {
-                font-size: 1.8rem;
-                font-weight: bold;
-                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-            }
-            
-            .btn-primary {
-                background: linear-gradient(135deg, var(--primary-color), #a855f7);
-                border: none;
-                transition: transform 0.2s;
-            }
-            
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
-            }
-            
-            .card {
-                background-color: var(--card-bg);
-                border: 1px solid #2a2a4e;
-                transition: transform 0.3s, box-shadow 0.3s;
-            }
-            
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
-            }
-            
-            .news-card-img {
-                height: 200px;
-                object-fit: cover;
-            }
-            
-            .category-badge {
-                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-                color: white;
-                padding: 0.25rem 0.75rem;
-                border-radius: 20px;
-                font-size: 0.85rem;
-            }
-            
-            .rating-stars {
-                color: #fbbf24;
-            }
-            
-            footer {
-                background-color: var(--dark-bg);
-                margin-top: 5rem;
-            }
-        </style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #14b8a6;
+            --dark-bg: #0d0d1f;
+            --card-bg: #1e1e3f;
+            --accent-color: #f43f5e;
+            --text-light: #f9fafb;
+            --text-strong: #ffffff;
+            --text-muted: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+        }
+
+        h1, h2, h3, h4, h5 {
+            color: var(--text-strong);
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            margin-bottom: 0.75rem;
+        }
+
+        p, span, li, td, th {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        a {
+            color: #38bdf8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+
+        a:hover {
+            color: #0ea5e9;
+            text-decoration: underline;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--dark-bg), #1f1f3f);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link, .dropdown-item {
+            color: var(--text-light) !important;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+            color: var(--text-light);
+            font-weight: 600;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #4b4b7f;
+            transition: transform 0.3s, box-shadow 0.3s;
+            padding: 1rem;
+            color: var(--text-light);
+        }
+
+        .card-title {
+            color: var(--text-strong);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .news-card-img {
+            height: 220px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        .category-badge, .badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .rating-stars {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            padding: 2rem 0;
+            border-top: 1px solid #2a2a4e;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+    </style>
     {% endblock %}
 </head>
 <body>
