@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Moderación de Denuncias - GameNews{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-shield-check"></i> Moderación de Denuncias</h1>
+    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Denunciante</th>
+                        <th>Motivo</th>
+                        <th>Comentario</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in pagination %}
+                        <tr>
+                            <td>{{ report.id }}</td>
+                            <td>{{ report.reporter.username }}</td>
+                            <td>
+                                {% if report.reason == 'inappropriate_content' %}
+                                    Contenido inapropiado
+                                {% elseif report.reason == 'offensive_language' %}
+                                    Lenguaje ofensivo
+                                {% elseif report.reason == 'harassment' %}
+                                    Acoso
+                                {% elseif report.reason == 'spam' %}
+                                    Spam
+                                {% else %}
+                                    Otros
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if report.comment %}
+                                    {{ report.comment.content|slice(0, 50) }}...
+                                {% else %}
+                                    <span class="text-muted">Comentario eliminado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if report.status == 'pending' %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                {% elseif report.status == 'resolved' %}
+                                    <span class="badge bg-success">Resuelto</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Descartado</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ report.createdAt|date('d/m/Y H:i') }}</td>
+                            <td>
+                                {% if report.status == 'pending' %}
+                                    <a href="{{ path('app_admin_moderation_review', {id: report.id}) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Revisar
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Procesado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No hay denuncias registradas</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

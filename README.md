@@ -57,10 +57,6 @@ php bin/console doctrine:migrations:migrate
 ### 5. Cargar datos de prueba (opcional)
 php bin/console doctrine:fixtures:load
 
-### 6. Crear directorios necesarios
-mkdir -p public/uploads/profiles
-mkdir -p public/uploads/news
-
 ## 👤 Usuarios de Prueba
 
 Si cargaste los fixtures, puedes usar estos usuarios:
@@ -163,6 +159,26 @@ git commit -m "feat: descripción del cambio"
 # Subir cambios
 git push origin feature/nombre-funcionalidad
 
+### Archivos NUEVOS creados:
+src/Controller/Admin/ModerationController.php
+src/Controller/Admin/UserManagementController.php
+src/Controller/ReportController.php
+src/Form/ReportFormType.php
+templates/admin/moderation/index.html.twig
+templates/admin/moderation/review.html.twig
+templates/admin/users/index.html.twig
+templates/report/comment.html.twig
+
+### Archivos ACTUALIZADOS:
+src/Controller/Admin/DashboardController.php
+src/Controller/NewsController.php
+src/Entity/Comment.php (constructor)
+src/Repository/NewsRepository.php
+templates/admin/dashboard/index.html.twig
+templates/news/show.html.twig
+templates/base.html.twig
+
+
 ## 🐛 Solución de Problemas
 
 ### Error: "No route found"
@@ -190,3 +206,5 @@ Este proyecto es parte de un trabajo académico.
 
 - Repositorio: https://github.com/RamassafraGH/PP1-GameNews.git
 - Documentación Symfony: https://symfony.com/doc/current/index.html
+
+

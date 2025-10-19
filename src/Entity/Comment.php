@@ -52,9 +52,10 @@ class Comment
 
     public function __construct()
     {
-        $this->votes = new ArrayCollection();
-        $this->reports = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
+    $this->votes = new ArrayCollection();
+    $this->reports = new ArrayCollection();
+    $this->createdAt = new \DateTimeImmutable();
+    $this->isApproved = true;
     }
 
     public function getId(): ?int

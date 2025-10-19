@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class NewsController extends AbstractController
 {
     #[Route('/', name: 'app_news_index')]
-    public function index(
+        public function index(
         Request $request,
         NewsRepository $newsRepository,
         CategoryRepository $categoryRepository,
@@ -34,16 +34,18 @@ class NewsController extends AbstractController
         $searchForm = $this->createForm(SearchFormType::class);
         $searchForm->handleRequest($request);
 
+        // Inicializar el query builder
         $queryBuilder = $newsRepository->createQueryBuilder('n')
             ->where('n.status = :status')
             ->setParameter('status', 'published')
             ->orderBy('n.publishedAt', 'DESC');
 
+        // Aplicar filtros si el formulario fue enviado
         if ($searchForm->isSubmitted() && $searchForm->isValid()) {
             $data = $searchForm->getData();
             
             $queryBuilder = $newsRepository->searchNews(
-                $data['query'] ?? '',
+                $data['query'] ?? null,
                 $data['category'] ?? null,
                 $data['tag'] ?? null,
                 $data['dateFrom'] ?? null,
@@ -84,7 +86,12 @@ class NewsController extends AbstractController
         $entityManager->flush();
 
         // Obtener comentarios aprobados
-        $comments = $commentRepository->findApprovedByNews($news);
+        $comments = $commentRepository->createQueryBuilder('c')
+        ->where('c.news = :news')
+        ->setParameter('news', $news)
+        ->orderBy('c.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
 
         // Formulario de comentarios
         $comment = new Comment();
@@ -93,18 +100,18 @@ class NewsController extends AbstractController
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
             if (!$this->getUser()) {
-                $this->addFlash('error', 'Debes iniciar sesión para comentar');
-                return $this->redirectToRoute('app_login');
-            }
+            $this->addFlash('error', 'Debes iniciar sesión para comentar');
+            return $this->redirectToRoute('app_login');
+        }
 
-            $comment->setAuthor($this->getUser());
-            $comment->setNews($news);
-            $comment->setIsApproved(false); // Requiere moderación
+        $comment->setAuthor($this->getUser());
+        $comment->setNews($news);
+    // Ya no se necesita setIsApproved(false), el constructor lo pone en true
 
-            $entityManager->persist($comment);
-            $entityManager->flush();
+        $entityManager->persist($comment);
+        $entityManager->flush();
 
-            $this->addFlash('success', 'Comentario enviado. Será visible tras su aprobación.');
+        $this->addFlash('success', 'Comentario publicado correctamente.');
 
             return $this->redirectToRoute('app_news_show', ['slug' => $slug]);
         }

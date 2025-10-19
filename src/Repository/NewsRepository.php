@@ -46,35 +46,49 @@ class NewsRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function searchNews(string $query, ?Category $category = null, ?Tag $tag = null, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null)
-    {
+    /**
+     * Búsqueda mejorada de noticias con filtros
+     */
+    public function searchNews(
+        ?string $query = null,
+        ?Category $category = null,
+        ?Tag $tag = null,
+        ?\DateTime $dateFrom = null,
+        ?\DateTime $dateTo = null
+    ) {
         $qb = $this->createQueryBuilder('n')
             ->where('n.status = :status')
             ->setParameter('status', 'published');
 
-        if ($query) {
-            $qb->andWhere('n.title LIKE :query OR n.body LIKE :query OR n.subtitle LIKE :query')
+        // Búsqueda por texto (en título, subtítulo y cuerpo)
+        if ($query && trim($query) !== '') {
+            $qb->andWhere('n.title LIKE :query OR n.subtitle LIKE :query OR n.body LIKE :query')
                ->setParameter('query', '%' . $query . '%');
         }
 
+        // Filtro por categoría
         if ($category) {
             $qb->join('n.categories', 'c')
                ->andWhere('c.id = :categoryId')
                ->setParameter('categoryId', $category->getId());
         }
 
+        // Filtro por etiqueta
         if ($tag) {
             $qb->join('n.tags', 't')
                ->andWhere('t.id = :tagId')
                ->setParameter('tagId', $tag->getId());
         }
 
+        // Filtro por rango de fechas
         if ($dateFrom) {
+            $dateFrom->setTime(0, 0, 0);
             $qb->andWhere('n.publishedAt >= :dateFrom')
                ->setParameter('dateFrom', $dateFrom);
         }
 
         if ($dateTo) {
+            $dateTo->setTime(23, 59, 59);
             $qb->andWhere('n.publishedAt <= :dateTo')
                ->setParameter('dateTo', $dateTo);
         }

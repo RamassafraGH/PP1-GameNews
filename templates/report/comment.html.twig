@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Denunciar Comentario - GameNews{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title mb-4">
+                    <i class="bi bi-exclamation-triangle text-warning"></i> Denunciar Comentario
+                </h3>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Estás a punto de denunciar un comentario. Por favor, proporciona información detallada para que nuestro equipo de moderación pueda revisarlo.
+                </div>
+
+                <div class="card mb-4" style="background-color: #1a1a2e;">
+                    <div class="card-body">
+                        <h5 class="card-title">Comentario a denunciar:</h5>
+                        <hr>
+                        <p><strong>Autor:</strong> {{ comment.author.username }}</p>
+                        <p><strong>Fecha:</strong> {{ comment.createdAt|date('d/m/Y H:i') }}</p>
+                        <div class="p-3 mt-3" style="background-color: #0f0f23; border-radius: 8px;">
+                            <p class="mb-0">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{ form_start(reportForm) }}
+                    <div class="mb-4">
+                        <label class="form-label">{{ form_label(reportForm.reason) }}</label>
+                        {{ form_widget(reportForm.reason) }}
+                        {{ form_errors(reportForm.reason) }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(reportForm.description) }}
+                        {{ form_widget(reportForm.description) }}
+                        {{ form_errors(reportForm.description) }}
+                        <small class="form-text text-muted">Máximo 500 caracteres</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-send"></i> Enviar Denuncia
+                        </button>
+                        <a href="{{ path('app_news_show', {slug: comment.news.slug}) }}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                {{ form_end(reportForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

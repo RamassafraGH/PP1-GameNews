@@ -1,234 +1,238 @@
-{% extends 'base.html.twig' %}
+        {% extends 'base.html.twig' %}
 
-{% block title %}{{ news.title }} - GameNews{% endblock %}
+        {% block title %}{{ news.title }} - GameNews{% endblock %}
 
-{% block body %}
-<article>
-    <div class="mb-3">
-        <a href="{{ path('app_news_index') }}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Volver a Noticias
-        </a>
-    </div>
-
-    <div class="card mb-4">
-        {% if news.featuredImage %}
-            <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
-        {% endif %}
-        
-        <div class="card-body">
+        {% block body %}
+        <article>
             <div class="mb-3">
-                {% for category in news.categories %}
-                    <span class="category-badge">{{ category.name }}</span>
-                {% endfor %}
-                {% for tag in news.tags %}
-                    <span class="badge bg-secondary">{{ tag.name }}</span>
-                {% endfor %}
+                <a href="{{ path('app_news_index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Noticias
+                </a>
             </div>
 
-            <h1 class="card-title">{{ news.title }}</h1>
-            
-            {% if news.subtitle %}
-                <h5 class="text-muted mb-4">{{ news.subtitle }}</h5>
-            {% endif %}
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <small class="text-muted">
-                        <i class="bi bi-person"></i> Por {{ news.author.username }}
-                    </small>
-                    <small class="text-muted ms-3">
-                        <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y H:i') }}
-                    </small>
-                    <small class="text-muted ms-3">
-                        <i class="bi bi-eye"></i> {{ news.viewCount }} vistas
-                    </small>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="news-content">
-                {{ news.body|nl2br }}
-            </div>
-
-            <hr>
-
-            <div class="rating-section text-center py-4">
-                <h5 class="mb-3">Valorar esta noticia</h5>
-                
-                {% if app.user %}
-                    {% if userRating %}
-                        <p class="text-muted">Ya has valorado esta noticia con {{ userRating }} estrellas</p>
-                    {% else %}
-                        <div id="rating-stars" class="rating-stars" style="font-size: 2rem; cursor: pointer;">
-                            {% for i in 1..5 %}
-                                <i class="bi bi-star rating-star" data-rating="{{ i }}"></i>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <p class="text-muted">
-                        <a href="{{ path('app_login') }}">Inicia sesión</a> para valorar esta noticia
-                    </p>
+            <div class="card mb-4">
+                {% if news.featuredImage %}
+                    <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
                 {% endif %}
+                
+                <div class="card-body">
+                    <div class="mb-3">
+                        {% for category in news.categories %}
+                            <span class="category-badge">{{ category.name }}</span>
+                        {% endfor %}
+                        {% for tag in news.tags %}
+                            <span class="badge bg-secondary">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
 
-                <div class="mt-3">
-                    <div class="rating-stars d-inline-block" style="font-size: 1.5rem;">
-                        {% if news.averageRating %}
-                            {% for i in 1..5 %}
-                                <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}"></i>
-                            {% endfor %}
-                            <span class="ms-2">{{ news.averageRating }} / 5</span>
-                            <small class="text-muted">({{ news.ratingCount }} valoraciones)</small>
+                    <h1 class="card-title">{{ news.title }}</h1>
+                    
+                    {% if news.subtitle %}
+                        <h5 class="text-muted mb-4">{{ news.subtitle }}</h5>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> Por {{ news.author.username }}
+                            </small>
+                            <small class="text-muted ms-3">
+                                <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y H:i') }}
+                            </small>
+                            <small class="text-muted ms-3">
+                                <i class="bi bi-eye"></i> {{ news.viewCount }} vistas
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="news-content">
+                        {{ news.body|nl2br }}
+                    </div>
+
+                    <hr>
+
+                    <div class="rating-section text-center py-4">
+                        <h5 class="mb-3">Valorar esta noticia</h5>
+                        
+                        {% if app.user %}
+                            {% if userRating %}
+                                <p class="text-muted">Ya has valorado esta noticia con {{ userRating }} estrellas</p>
+                            {% else %}
+                                <div id="rating-stars" class="rating-stars" style="font-size: 2rem; cursor: pointer;">
+                                    {% for i in 1..5 %}
+                                        <i class="bi bi-star rating-star" data-rating="{{ i }}"></i>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         {% else %}
-                            <span class="text-muted">Sin valoraciones aún</span>
+                            <p class="text-muted">
+                                <a href="{{ path('app_login') }}">Inicia sesión</a> para valorar esta noticia
+                            </p>
                         {% endif %}
+
+                        <div class="mt-3">
+                            <div class="rating-stars d-inline-block" style="font-size: 1.5rem;">
+                                {% if news.averageRating %}
+                                    {% for i in 1..5 %}
+                                        <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}"></i>
+                                    {% endfor %}
+                                    <span class="ms-2">{{ news.averageRating }} / 5</span>
+                                    <small class="text-muted">({{ news.ratingCount }} valoraciones)</small>
+                                {% else %}
+                                    <span class="text-muted">Sin valoraciones aún</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title mb-4">
-                <i class="bi bi-chat-dots"></i> Comentarios ({{ comments|length }})
-            </h4>
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="bi bi-chat-dots"></i> Comentarios ({{ comments|length }})
+                    </h4>
 
-            {% if app.user %}
-                <div class="mb-4">
-                    <h5>Agregar comentario</h5>
-                    {{ form_start(commentForm) }}
-                        {{ form_widget(commentForm.content) }}
-                        <div class="mt-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-send"></i> Enviar Comentario
-                            </button>
-                        </div>
-                    {{ form_end(commentForm) }}
-                    <small class="text-muted">Tu comentario será visible después de ser aprobado por un moderador.</small>
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    <a href="{{ path('app_login') }}">Inicia sesión</a> para dejar un comentario
-                </div>
-            {% endif %}
-
-            <hr>
-
-            {% for comment in comments %}
-                <div class="comment mb-4 p-3" style="background-color: #1a1a2e; border-radius: 8px;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <strong>{{ comment.author.username }}</strong>
-                            <small class="text-muted ms-2">{{ comment.createdAt|date('d/m/Y H:i') }}</small>
-                        </div>
-                    </div>
-                    
-                    <p class="mb-2">{{ comment.content }}</p>
-                    
-                    <div class="d-flex gap-3">
                         {% if app.user %}
-                            <button class="btn btn-sm btn-outline-success vote-btn" 
-                                    data-comment-id="{{ comment.id }}" 
-                                    data-type="like"
-                                    {% if userVotes[comment.id]|default('') == 'like' %}disabled{% endif %}>
-                                <i class="bi bi-hand-thumbs-up"></i> 
-                                <span class="likes-count">{{ comment.likesCount }}</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger vote-btn" 
-                                    data-comment-id="{{ comment.id }}" 
-                                    data-type="dislike"
-                                    {% if userVotes[comment.id]|default('') == 'dislike' %}disabled{% endif %}>
-                                <i class="bi bi-hand-thumbs-down"></i> 
-                                <span class="dislikes-count">{{ comment.dislikesCount }}</span>
-                            </button>
-                        {% else %}
-                            <small class="text-muted">
-                                <i class="bi bi-hand-thumbs-up"></i> {{ comment.likesCount }}
-                                <i class="bi bi-hand-thumbs-down ms-2"></i> {{ comment.dislikesCount }}
-                            </small>
-                        {% endif %}
+            <div class="mb-4">
+                <h5>Agregar comentario</h5>
+                {{ form_start(commentForm) }}
+                    {{ form_widget(commentForm.content) }}
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Enviar Comentario
+                        </button>
                     </div>
+                {{ form_end(commentForm) }}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <a href="{{ path('app_login') }}">Inicia sesión</a> para dejar un comentario
+            </div>
+        {% endif %}
+
+                    <hr>
+
+                    {% for comment in comments %}
+            <div class="comment mb-4 p-3" style="background-color: #1a1a2e; border-radius: 8px;">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <strong>{{ comment.author.username }}</strong>
+                        <small class="text-muted ms-2">{{ comment.createdAt|date('d/m/Y H:i') }}</small>
+                    </div>
+                    {% if app.user and app.user != comment.author %}
+                        <a href="{{ path('app_report_comment', {id: comment.id}) }}" class="btn btn-sm btn-outline-warning" title="Denunciar comentario">
+                            <i class="bi bi-flag"></i>
+                        </a>
+                    {% endif %}
                 </div>
-            {% else %}
-                <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
-            {% endfor %}
-        </div>
-    </div>
-</article>
+                
+                <p class="mb-2">{{ comment.content }}</p>
+                
+                <div class="d-flex gap-3">
+                    {% if app.user %}
+                        <button class="btn btn-sm btn-outline-success vote-btn" 
+                                data-comment-id="{{ comment.id }}" 
+                                data-type="like"
+                                {% if userVotes[comment.id]|default('') == 'like' %}disabled{% endif %}>
+                            <i class="bi bi-hand-thumbs-up"></i> 
+                            <span class="likes-count">{{ comment.likesCount }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger vote-btn" 
+                                data-comment-id="{{ comment.id }}" 
+                                data-type="dislike"
+                                {% if userVotes[comment.id]|default('') == 'dislike' %}disabled{% endif %}>
+                            <i class="bi bi-hand-thumbs-down"></i> 
+                            <span class="dislikes-count">{{ comment.dislikesCount }}</span>
+                        </button>
+                    {% else %}
+                        <small class="text-muted">
+                            <i class="bi bi-hand-thumbs-up"></i> {{ comment.likesCount }}
+                            <i class="bi bi-hand-thumbs-down ms-2"></i> {{ comment.dislikesCount }}
+                        </small>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+        {% endfor %}
+                </div>
+            </div>
+        </article>
 
-{% endblock %}
+        {% endblock %}
 
-{% block javascripts %}
-<script>
-    // Votación de noticias
-    document.querySelectorAll('.rating-star').forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = this.dataset.rating;
-            
-            fetch('{{ path('app_news_vote', {slug: news.slug}) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'rating=' + rating
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.error);
-                }
-            });
-        });
-
-        star.addEventListener('mouseenter', function() {
-            const rating = this.dataset.rating;
-            document.querySelectorAll('.rating-star').forEach((s, index) => {
-                if (index < rating) {
-                    s.classList.remove('bi-star');
-                    s.classList.add('bi-star-fill');
-                } else {
-                    s.classList.remove('bi-star-fill');
-                    s.classList.add('bi-star');
-                }
-            });
-        });
-    });
-
-    // Votación de comentarios
-    document.querySelectorAll('.vote-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const type = this.dataset.type;
-            
-            fetch('/comentarios/' + commentId + '/votar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'type=' + type
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const comment = this.closest('.comment');
-                    comment.querySelector('.likes-count').textContent = data.likesCount;
-                    comment.querySelector('.dislikes-count').textContent = data.dislikesCount;
+        {% block javascripts %}
+        <script>
+            // Votación de noticias
+            document.querySelectorAll('.rating-star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
                     
-                    if (data.action === 'added' || data.action === 'changed') {
-                        comment.querySelectorAll('.vote-btn').forEach(b => b.disabled = false);
-                        this.disabled = true;
-                    } else if (data.action === 'removed') {
-                        this.disabled = false;
-                    }
-                } else {
-                    alert(data.error);
-                }
+                    fetch('{{ path('app_news_vote', {slug: news.slug}) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'rating=' + rating
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.error);
+                        }
+                    });
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    const rating = this.dataset.rating;
+                    document.querySelectorAll('.rating-star').forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.remove('bi-star');
+                            s.classList.add('bi-star-fill');
+                        } else {
+                            s.classList.remove('bi-star-fill');
+                            s.classList.add('bi-star');
+                        }
+                    });
+                });
             });
-        });
-    });
-</script>
-{% endblock %}
+
+            // Votación de comentarios
+            document.querySelectorAll('.vote-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const commentId = this.dataset.commentId;
+                    const type = this.dataset.type;
+                    
+                    fetch('/comentarios/' + commentId + '/votar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'type=' + type
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const comment = this.closest('.comment');
+                            comment.querySelector('.likes-count').textContent = data.likesCount;
+                            comment.querySelector('.dislikes-count').textContent = data.dislikesCount;
+                            
+                            if (data.action === 'added' || data.action === 'changed') {
+                                comment.querySelectorAll('.vote-btn').forEach(b => b.disabled = false);
+                                this.disabled = true;
+                            } else if (data.action === 'removed') {
+                                this.disabled = false;
+                            }
+                        } else {
+                            alert(data.error);
+                        }
+                    });
+                });
+            });
+        </script>
+        {% endblock %}

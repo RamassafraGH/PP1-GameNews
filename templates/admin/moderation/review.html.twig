@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Revisar Denuncia - GameNews{% endblock %}
+
+{% block body %}
+<div class="mb-3">
+    <a href="{{ path('app_admin_moderation_index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title"><i class="bi bi-chat-dots"></i> Comentario Denunciado</h3>
+                <hr>
+                
+                {% if report.comment %}
+                    <div class="alert alert-secondary">
+                        <strong>Autor:</strong> {{ report.comment.author.username }}<br>
+                        <strong>Fecha:</strong> {{ report.comment.createdAt|date('d/m/Y H:i') }}<br>
+                        <strong>Noticia:</strong> <a href="{{ path('app_news_show', {slug: report.comment.news.slug}) }}" target="_blank">{{ report.comment.news.title }}</a>
+                    </div>
+                    
+                    <div class="p-3" style="background-color: #1a1a2e; border-radius: 8px;">
+                        <p class="mb-0">{{ report.comment.content }}</p>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        El comentario ya ha sido eliminado.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title"><i class="bi bi-exclamation-triangle"></i> Acciones de Moderación</h3>
+                <hr>
+                
+                <form method="post">
+                    <div class="d-flex gap-3">
+                        {% if report.comment %}
+                            <button type="submit" name="action" value="delete_comment" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este comentario?')">
+                                <i class="bi bi-trash"></i> Eliminar Comentario
+                            </button>
+                        {% endif %}
+                        
+                        <button type="submit" name="action" value="dismiss" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Descartar Denuncia
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle"></i> Información de la Denuncia</h5>
+                <hr>
+                
+                <p><strong>ID:</strong> {{ report.id }}</p>
+                <p><strong>Denunciante:</strong> {{ report.reporter.username }}</p>
+                <p><strong>Email:</strong> {{ report.reporter.email }}</p>
+                <p><strong>Fecha:</strong> {{ report.createdAt|date('d/m/Y H:i') }}</p>
+                
+                <p><strong>Motivo:</strong><br>
+                    <span class="badge bg-warning">
+                        {% if report.reason == 'inappropriate_content' %}
+                            Contenido inapropiado
+                        {% elseif report.reason == 'offensive_language' %}
+                            Lenguaje ofensivo
+                        {% elseif report.reason == 'harassment' %}
+                            Acoso o grooming
+                        {% elseif report.reason == 'spam' %}
+                            Spam o publicidad
+                        {% else %}
+                            Otros
+                        {% endif %}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-text"></i> Descripción</h5>
+                <hr>
+                <p>{{ report.description }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
