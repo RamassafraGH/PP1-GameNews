@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enviar Boletín - GameNews{% endblock %}
+
+{% block body %}
+<div class="mb-3">
+    <a href="{{ path('app_admin_newsletter_subscribers') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">
+                    <i class="bi bi-send"></i> Enviar Boletín a Suscriptores
+                </h3>
+
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle"></i> Selecciona las noticias que deseas incluir en el boletín. Se enviarán a todos los usuarios suscritos.
+                </div>
+
+                <form method="post">
+                    <h5 class="mb-3">Noticias Disponibles (últimos 30 días)</h5>
+                    
+                    {% if recentNews %}
+                        <div class="row g-3 mb-4">
+                            {% for news in recentNews %}
+                                <div class="col-md-6">
+                                    <div class="card h-100" style="background-color: #1a1a2e;">
+                                        <div class="card-body">
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" name="news[]" value="{{ news.id }}" id="news{{ news.id }}">
+                                                <label class="form-check-label" for="news{{ news.id }}">
+                                                    <strong>Incluir en boletín</strong>
+                                                </label>
+                                            </div>
+
+                                            {% if news.featuredImage %}
+                                                <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top mb-3" style="max-height: 150px; object-fit: cover;" alt="{{ news.title }}">
+                                            {% endif %}
+
+                                            <h6 class="card-title">{{ news.title }}</h6>
+                                            <p class="card-text text-muted small">{{ news.subtitle|default('') }}</p>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y') }}
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-eye"></i> {{ news.viewCount }} vistas
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Enviar Boletín
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = true)">
+                                <i class="bi bi-check-all"></i> Seleccionar Todas
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false)">
+                                <i class="bi bi-x"></i> Desmarcar Todas
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> No hay noticias recientes para enviar en el boletín.
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -28,12 +28,14 @@ class DashboardController extends AbstractController
         $publishedNews = count($newsRepository->findBy(['status' => 'published']));
         $totalComments = count($commentRepository->findAll());
         $recentNews = $newsRepository->findBy([], ['createdAt' => 'DESC'], 10);
+        
+        // Contador de suscriptores (visible para editores y admins)
+        $subscribersCount = count($userRepository->findActiveSubscribers());
 
         // Datos específicos para ADMIN
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         $totalUsers = $isAdmin ? count($userRepository->findAll()) : null;
         $pendingReports = $isAdmin ? count($reportRepository->findPendingReports()) : null;
-        $subscribersCount = $isAdmin ? count($userRepository->findActiveSubscribers()) : null;
 
         // Estadísticas avanzadas para admin
         $monthlyStats = null;
