@@ -10,7 +10,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-lg-8 mb-4">
         <div class="card mb-4">
             <div class="card-body">
                 <h3 class="card-title"><i class="bi bi-chat-dots"></i> Comentario Denunciado</h3>
@@ -18,13 +18,24 @@
                 
                 {% if report.comment %}
                     <div class="alert alert-secondary">
-                        <strong>Autor:</strong> {{ report.comment.author.username }}<br>
-                        <strong>Fecha:</strong> {{ report.comment.createdAt|date('d/m/Y H:i') }}<br>
-                        <strong>Noticia:</strong> <a href="{{ path('app_news_show', {slug: report.comment.news.slug}) }}" target="_blank">{{ report.comment.news.title }}</a>
+                        <div class="row">
+                            <div class="col-md-6 mb-2 mb-md-0">
+                                <strong>Autor:</strong> {{ report.comment.author.username }}
+                            </div>
+                            <div class="col-md-6 mb-2 mb-md-0">
+                                <strong>Fecha:</strong> {{ report.comment.createdAt|date('d/m/Y H:i') }}
+                            </div>
+                            <div class="col-12 mt-2">
+                                <strong>Noticia:</strong> 
+                                <a href="{{ path('app_news_show', {slug: report.comment.news.slug}) }}" target="_blank" class="text-break">
+                                    {{ report.comment.news.title }}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="p-3" style="background-color: #1a1a2e; border-radius: 8px;">
-                        <p class="mb-0">{{ report.comment.content }}</p>
+                        <p class="mb-0 text-break">{{ report.comment.content }}</p>
                     </div>
                 {% else %}
                     <div class="alert alert-warning">
@@ -40,14 +51,14 @@
                 <hr>
                 
                 <form method="post">
-                    <div class="d-flex gap-3">
+                    <div class="d-grid gap-2 d-md-flex">
                         {% if report.comment %}
-                            <button type="submit" name="action" value="delete_comment" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este comentario?')">
+                            <button type="submit" name="action" value="delete_comment" class="btn btn-danger flex-fill" onclick="return confirm('¿Estás seguro de eliminar este comentario?')">
                                 <i class="bi bi-trash"></i> Eliminar Comentario
                             </button>
                         {% endif %}
                         
-                        <button type="submit" name="action" value="dismiss" class="btn btn-secondary">
+                        <button type="submit" name="action" value="dismiss" class="btn btn-secondary flex-fill">
                             <i class="bi bi-x-circle"></i> Descartar Denuncia
                         </button>
                     </div>
@@ -56,19 +67,35 @@
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card mb-4">
+    <div class="col-lg-4">
+        <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-info-circle"></i> Información de la Denuncia</h5>
                 <hr>
                 
-                <p><strong>ID:</strong> {{ report.id }}</p>
-                <p><strong>Denunciante:</strong> {{ report.reporter.username }}</p>
-                <p><strong>Email:</strong> {{ report.reporter.email }}</p>
-                <p><strong>Fecha:</strong> {{ report.createdAt|date('d/m/Y H:i') }}</p>
+                <div class="mb-3">
+                    <strong>ID:</strong> 
+                    <span class="float-end">#{{ report.id }}</span>
+                </div>
                 
-                <p><strong>Motivo:</strong><br>
-                    <span class="badge bg-warning">
+                <div class="mb-3">
+                    <strong>Denunciante:</strong><br>
+                    <span class="text-break">{{ report.reporter.username }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Email:</strong><br>
+                    <span class="text-break small">{{ report.reporter.email }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Fecha:</strong><br>
+                    {{ report.createdAt|date('d/m/Y H:i') }}
+                </div>
+                
+                <div>
+                    <strong>Motivo:</strong><br>
+                    <span class="badge bg-warning text-dark mt-2">
                         {% if report.reason == 'inappropriate_content' %}
                             Contenido inapropiado
                         {% elseif report.reason == 'offensive_language' %}
@@ -81,7 +108,7 @@
                             Otros
                         {% endif %}
                     </span>
-                </p>
+                </div>
             </div>
         </div>
 
@@ -89,7 +116,7 @@
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-file-text"></i> Descripción</h5>
                 <hr>
-                <p>{{ report.description }}</p>
+                <p class="text-break">{{ report.description }}</p>
             </div>
         </div>
     </div>

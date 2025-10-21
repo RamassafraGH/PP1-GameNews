@@ -161,6 +161,7 @@ git push origin feature/nombre-funcionalidad
 
 ### Archivos NUEVOS creados:
 src/Controller/Admin/ModerationController.php
+src/Controller/Admin/NewsletterController.php
 src/Controller/Admin/UserManagementController.php
 src/Controller/ReportController.php
 src/Form/ReportFormType.php
@@ -171,12 +172,19 @@ templates/report/comment.html.twig
 
 ### Archivos ACTUALIZADOS:
 src/Controller/Admin/DashboardController.php
-src/Controller/NewsController.php
+src/Controller/NewsController.php (método vote)
+src/Entity/NewsRating.php (agregar método)
 src/Entity/Comment.php (constructor)
 src/Repository/NewsRepository.php
-templates/admin/dashboard/index.html.twig
-templates/news/show.html.twig
+templates/admin/dashboard/index.html.twig (reescribir completamente)
+templates/admin/moderation/index.html.twig (actualizar responsive)
+templates/admin/moderation/review.html.twig (reescribir)
+templates/news/show.html.twig (sistema de votación)
+templates/news/index.html.twig (cards de noticias)
+templates/home/index.html.twig (cards destacadas)
 templates/base.html.twig
+templates/admin/newsletter/subscribers.html.twig
+templates/admin/newsletter/send.html.twig
 
 
 ## 🐛 Solución de Problemas

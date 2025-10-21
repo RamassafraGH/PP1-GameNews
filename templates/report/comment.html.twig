@@ -3,55 +3,92 @@
 {% block title %}Denunciar Comentario - GameNews{% endblock %}
 
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h3 class="card-title mb-4">
-                    <i class="bi bi-exclamation-triangle text-warning"></i> Denunciar Comentario
-                </h3>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="bi bi-exclamation-triangle text-warning"></i> Denunciar Comentario
+                    </h3>
 
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> Estás a punto de denunciar un comentario. Por favor, proporciona información detallada para que nuestro equipo de moderación pueda revisarlo.
-                </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Estás a punto de denunciar un comentario. Por favor, proporciona información detallada para que nuestro equipo de moderación pueda revisarlo.
+                    </div>
 
-                <div class="card mb-4" style="background-color: #1a1a2e;">
-                    <div class="card-body">
-                        <h5 class="card-title">Comentario a denunciar:</h5>
-                        <hr>
-                        <p><strong>Autor:</strong> {{ comment.author.username }}</p>
-                        <p><strong>Fecha:</strong> {{ comment.createdAt|date('d/m/Y H:i') }}</p>
-                        <div class="p-3 mt-3" style="background-color: #0f0f23; border-radius: 8px;">
-                            <p class="mb-0">{{ comment.content }}</p>
+                    <div class="card mb-4" style="background-color: #1a1a2e;">
+                        <div class="card-body">
+                            <h5 class="card-title">Comentario a denunciar:</h5>
+                            <hr>
+                            <div class="row g-2 mb-3">
+                                <div class="col-sm-6">
+                                    <strong>Autor:</strong> {{ comment.author.username }}
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Fecha:</strong> {{ comment.createdAt|date('d/m/Y H:i') }}
+                                </div>
+                            </div>
+                            <div class="p-3 mt-3" style="background-color: #0f0f23; border-radius: 8px;">
+                                <p class="mb-0 text-break">{{ comment.content }}</p>
+                            </div>
                         </div>
                     </div>
+
+                    {{ form_start(reportForm) }}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ form_label(reportForm.reason) }}</label>
+                            <div class="row g-3">
+                                {% for choice in reportForm.reason %}
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <div class="form-check p-3" style="background-color: #1a1a2e; border-radius: 8px;">
+                                            {{ form_widget(choice) }}
+                                            {{ form_label(choice) }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(reportForm.reason) }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_label(reportForm.description, 'Descripción detallada', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(reportForm.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Por favor, describe el problema con más detalle...'}}) }}
+                            {{ form_errors(reportForm.description) }}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Máximo 500 caracteres
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-send"></i> Enviar Denuncia
+                            </button>
+                            <a href="{{ path('app_news_show', {slug: comment.news.slug}) }}" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    {{ form_end(reportForm) }}
                 </div>
-
-                {{ form_start(reportForm) }}
-                    <div class="mb-4">
-                        <label class="form-label">{{ form_label(reportForm.reason) }}</label>
-                        {{ form_widget(reportForm.reason) }}
-                        {{ form_errors(reportForm.reason) }}
-                    </div>
-
-                    <div class="mb-4">
-                        {{ form_label(reportForm.description) }}
-                        {{ form_widget(reportForm.description) }}
-                        {{ form_errors(reportForm.description) }}
-                        <small class="form-text text-muted">Máximo 500 caracteres</small>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-send"></i> Enviar Denuncia
-                        </button>
-                        <a href="{{ path('app_news_show', {slug: comment.news.slug}) }}" class="btn btn-secondary">
-                            <i class="bi bi-x-lg"></i> Cancelar
-                        </a>
-                    </div>
-                {{ form_end(reportForm) }}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-check {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .form-check:hover {
+            background-color: #2a2a4e !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+        }
+        .form-check-input:checked + .form-check-label {
+            color: var(--primary-color);
+        }
+    </style>
 {% endblock %}

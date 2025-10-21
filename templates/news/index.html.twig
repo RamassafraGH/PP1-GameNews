@@ -7,19 +7,31 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <h5 class="card-title"><i class="bi bi-search"></i> Buscar Noticias</h5>
-        {{ form_start(searchForm, {'method': 'GET'}) }}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0"><i class="bi bi-search"></i> Buscar Noticias</h5>
+            {% if hasSearch %}
+                <a href="{{ path('app_news_index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Limpiar búsqueda
+                </a>
+            {% endif %}
+        </div>
+
+        {{ form_start(searchForm, {'method': 'GET', 'attr': {'id': 'searchForm'}}) }}
             <div class="row g-3">
-                <div class="col-md-4">
-                    {{ form_widget(searchForm.query) }}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label small">Buscar por texto</label>
+                    {{ form_widget(searchForm.query, {'attr': {'placeholder': 'Título, contenido...'}}) }}
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label class="form-label small">Categoría</label>
                     {{ form_widget(searchForm.category) }}
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label class="form-label small">Etiqueta</label>
                     {{ form_widget(searchForm.tag) }}
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label class="form-label small">&nbsp;</label>
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Buscar
                     </button>
@@ -27,22 +39,29 @@
             </div>
             
             <div class="row g-3 mt-2">
-                <div class="col-md-5">
-                    {{ form_label(searchForm.dateFrom) }}
+                <div class="col-12 col-md-6">
+                    {{ form_label(searchForm.dateFrom, 'Desde', {'label_attr': {'class': 'form-label small'}}) }}
                     {{ form_widget(searchForm.dateFrom) }}
                 </div>
-                <div class="col-md-5">
-                    {{ form_label(searchForm.dateTo) }}
+                <div class="col-12 col-md-6">
+                    {{ form_label(searchForm.dateTo, 'Hasta', {'label_attr': {'class': 'form-label small'}}) }}
                     {{ form_widget(searchForm.dateTo) }}
                 </div>
             </div>
         {{ form_end(searchForm) }}
+
+        {% if hasSearch %}
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="bi bi-filter"></i> 
+                Mostrando <strong>{{ pagination.getTotalItemCount }}</strong> resultado(s) de búsqueda
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <div class="row g-4">
     {% for news in pagination %}
-        <div class="col-md-4">
+        <div class="col-12 col-sm-6 col-lg-4">
             <div class="card h-100">
                 {% if news.featuredImage %}
                     <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top news-card-img" alt="{{ news.title }}">
@@ -58,7 +77,7 @@
                     {% endfor %}
                     
                     <h5 class="card-title mt-2">{{ news.title }}</h5>
-                    <p class="card-text text-muted">{{ news.subtitle|default('') }}</p>
+                    <p class="card-text text-muted">{{ news.subtitle|default('')|slice(0, 80) }}{% if news.subtitle|length > 80 %}...{% endif %}</p>
                     
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <small class="text-muted">
@@ -71,9 +90,9 @@
                     
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="rating-stars">
-                            {% if news.averageRating %}
+                            {% if news.ratingCount > 0 %}
                                 {% for i in 1..5 %}
-                                    <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}"></i>
+                                    <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}" style="color: #fbbf24;"></i>
                                 {% endfor %}
                                 <small>({{ news.ratingCount }})</small>
                             {% else %}
@@ -95,14 +114,22 @@
         </div>
     {% else %}
         <div class="col-12">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> No se encontraron noticias.
+            <div class="alert alert-warning">
+                <i class="bi bi-info-circle"></i> 
+                {% if hasSearch %}
+                    No se encontraron noticias que coincidan con tu búsqueda.
+                    <a href="{{ path('app_news_index') }}" class="alert-link">Ver todas las noticias</a>
+                {% else %}
+                    No hay noticias publicadas todavía.
+                {% endif %}
             </div>
         </div>
     {% endfor %}
 </div>
 
-<div class="mt-4">
-    {{ knp_pagination_render(pagination) }}
-</div>
+{% if pagination.getTotalItemCount > 0 %}
+    <div class="mt-4">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+{% endif %}
 {% endblock %}

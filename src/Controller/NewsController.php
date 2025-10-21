@@ -24,26 +24,29 @@ use Symfony\Component\Routing\Annotation\Route;
 class NewsController extends AbstractController
 {
     #[Route('/', name: 'app_news_index')]
-        public function index(
-        Request $request,
-        NewsRepository $newsRepository,
-        CategoryRepository $categoryRepository,
-        TagRepository $tagRepository,
-        PaginatorInterface $paginator
-    ): Response {
-        $searchForm = $this->createForm(SearchFormType::class);
-        $searchForm->handleRequest($request);
+public function index(
+    Request $request,
+    NewsRepository $newsRepository,
+    CategoryRepository $categoryRepository,
+    TagRepository $tagRepository,
+    PaginatorInterface $paginator
+): Response {
+    $searchForm = $this->createForm(SearchFormType::class);
+    $searchForm->handleRequest($request);
 
-        // Inicializar el query builder
-        $queryBuilder = $newsRepository->createQueryBuilder('n')
-            ->where('n.status = :status')
-            ->setParameter('status', 'published')
-            ->orderBy('n.publishedAt', 'DESC');
+    $hasSearch = false;
+    $queryBuilder = $newsRepository->createQueryBuilder('n')
+        ->where('n.status = :status')
+        ->setParameter('status', 'published')
+        ->orderBy('n.publishedAt', 'DESC');
 
-        // Aplicar filtros si el formulario fue enviado
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            $data = $searchForm->getData();
-            
+    // Aplicar filtros si hay datos en la búsqueda
+    if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+        $data = $searchForm->getData();
+        
+        // Verificar si al menos un campo tiene valor
+        if (!empty($data['query']) || $data['category'] || $data['tag'] || $data['dateFrom'] || $data['dateTo']) {
+            $hasSearch = true;
             $queryBuilder = $newsRepository->searchNews(
                 $data['query'] ?? null,
                 $data['category'] ?? null,
@@ -52,18 +55,20 @@ class NewsController extends AbstractController
                 $data['dateTo'] ?? null
             );
         }
-
-        $pagination = $paginator->paginate(
-            $queryBuilder,
-            $request->query->getInt('page', 1),
-            12
-        );
-
-        return $this->render('news/index.html.twig', [
-            'pagination' => $pagination,
-            'searchForm' => $searchForm->createView(),
-        ]);
     }
+
+    $pagination = $paginator->paginate(
+        $queryBuilder,
+        $request->query->getInt('page', 1),
+        12
+    );
+
+    return $this->render('news/index.html.twig', [
+        'pagination' => $pagination,
+        'searchForm' => $searchForm->createView(),
+        'hasSearch' => $hasSearch,
+    ]);
+}
 
     #[Route('/{slug}', name: 'app_news_show')]
     public function show(
@@ -144,51 +149,52 @@ class NewsController extends AbstractController
     }
 
     #[Route('/{slug}/votar', name: 'app_news_vote', methods: ['POST'])]
-    public function vote(
-        string $slug,
-        Request $request,
-        NewsRepository $newsRepository,
-        NewsRatingRepository $ratingRepository,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
-        if (!$this->getUser()) {
-            return new JsonResponse(['error' => 'Debes iniciar sesión'], 401);
-        }
-
-        $news = $newsRepository->findBySlug($slug);
-        if (!$news) {
-            return new JsonResponse(['error' => 'Noticia no encontrada'], 404);
-        }
-
-        $rating = $request->request->getInt('rating');
-        if ($rating < 1 || $rating > 5) {
-            return new JsonResponse(['error' => 'Puntuación inválida'], 400);
-        }
-
-        $existingRating = $ratingRepository->findUserRatingForNews($this->getUser(), $news);
-
-        if ($existingRating) {
-            return new JsonResponse(['error' => 'Ya has votado esta noticia'], 400);
-        }
-
-        $newsRating = new NewsRating();
-        $newsRating->setUser($this->getUser());
-        $newsRating->setNews($news);
-        $newsRating->setRating($rating);
-
-        $entityManager->persist($newsRating);
-
-        // Actualizar promedio
-        $news->setRatingCount($news->getRatingCount() + 1);
-        $avgRating = $ratingRepository->calculateAverageRating($news);
-        $news->setAverageRating(number_format($avgRating, 2));
-
-        $entityManager->flush();
-
-        return new JsonResponse([
-            'success' => true,
-            'averageRating' => $news->getAverageRating(),
-            'ratingCount' => $news->getRatingCount(),
-        ]);
+public function vote(
+    string $slug,
+    Request $request,
+    NewsRepository $newsRepository,
+    NewsRatingRepository $ratingRepository,
+    EntityManagerInterface $entityManager
+): JsonResponse {
+    if (!$this->getUser()) {
+        return new JsonResponse(['error' => 'Debes iniciar sesión'], 401);
     }
+
+    $news = $newsRepository->findBySlug($slug);
+    if (!$news) {
+        return new JsonResponse(['error' => 'Noticia no encontrada'], 404);
+    }
+
+    $rating = $request->request->getInt('rating');
+    if ($rating < 1 || $rating > 5) {
+        return new JsonResponse(['error' => 'Puntuación inválida'], 400);
+    }
+
+    $existingRating = $ratingRepository->findUserRatingForNews($this->getUser(), $news);
+
+    if ($existingRating) {
+        return new JsonResponse(['error' => 'Ya has votado esta noticia'], 400);
+    }
+
+    $newsRating = new NewsRating();
+    $newsRating->setUser($this->getUser());
+    $newsRating->setNews($news);
+    $newsRating->setRating($rating);
+
+    $entityManager->persist($newsRating);
+    $entityManager->flush();
+
+    // Recalcular promedio
+    $avgRating = $ratingRepository->calculateAverageRating($news);
+    $news->setAverageRating(number_format($avgRating, 2));
+    $news->setRatingCount($news->getRatingCount() + 1);
+    $entityManager->flush();
+
+    return new JsonResponse([
+        'success' => true,
+        'averageRating' => $news->getAverageRating(),
+        'ratingCount' => $news->getRatingCount(),
+        'userRating' => $rating,
+    ]);
+}
 }

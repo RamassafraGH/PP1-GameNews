@@ -210,28 +210,34 @@
                     <a class="nav-link" href="{{ path('app_news_index') }}">Noticias</a>
                 </li>
                 
-                {% if is_granted('ROLE_EDITOR') %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_admin_dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> 
-                            {% if is_granted('ROLE_ADMIN') %}
-                                Admin
-                            {% else %}
-                                Editor
-                            {% endif %}
-                        </a>
-                    </li>
-                {% endif %}
-                
                 {% if app.user %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> {{ app.user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ path('app_profile') }}">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_profile') }}">
+                                <i class="bi bi-person"></i> Mi Perfil
+                            </a></li>
+                            
+                            {% if is_granted('ROLE_EDITOR') %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_admin_dashboard') }}">
+                                        <i class="bi bi-speedometer2"></i> 
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            Panel de Administración
+                                        {% else %}
+                                            Panel de Editor
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('app_logout') }}">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </a></li>
                         </ul>
                     </li>
                 {% else %}
