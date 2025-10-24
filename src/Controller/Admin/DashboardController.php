@@ -7,6 +7,7 @@ use App\Repository\NewsRepository;
 use App\Repository\ReportRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -17,6 +18,7 @@ class DashboardController extends AbstractController
 {
     #[Route('/', name: 'app_admin_dashboard')]
     public function index(
+        Request $request,
         NewsRepository $newsRepository,
         UserRepository $userRepository,
         CommentRepository $commentRepository,
@@ -37,14 +39,12 @@ class DashboardController extends AbstractController
         $totalUsers = $isAdmin ? count($userRepository->findAll()) : null;
         $pendingReports = $isAdmin ? count($reportRepository->findPendingReports()) : null;
 
-        // Estadísticas avanzadas para admin
+        // Estadísticas con filtro de período
         $monthlyStats = null;
+        $period = $request->query->get('period', 'month'); // week, month, year
+        
         if ($isAdmin) {
-            $monthlyStats = [
-                'newsThisMonth' => $this->getNewsCountThisMonth($newsRepository),
-                'commentsThisMonth' => $this->getCommentsCountThisMonth($commentRepository),
-                'newUsersThisMonth' => $this->getUsersCountThisMonth($userRepository),
-            ];
+            $monthlyStats = $this->getStatsByPeriod($period, $newsRepository, $commentRepository, $userRepository);
         }
 
         return $this->render('admin/dashboard/index.html.twig', [
@@ -56,35 +56,74 @@ class DashboardController extends AbstractController
             'isAdmin' => $isAdmin,
             'subscribersCount' => $subscribersCount,
             'monthlyStats' => $monthlyStats,
+            'currentPeriod' => $period,
         ]);
     }
 
-    private function getNewsCountThisMonth(NewsRepository $repository): int
+    private function getStatsByPeriod(string $period, NewsRepository $newsRepo, CommentRepository $commentRepo, UserRepository $userRepo): array
     {
-        $startOfMonth = new \DateTime('first day of this month 00:00:00');
+        $startDate = $this->getStartDateByPeriod($period);
+        
+        return [
+            'newsCount' => $this->getNewsCountSince($newsRepo, $startDate),
+            'commentsCount' => $this->getCommentsCountSince($commentRepo, $startDate),
+            'newUsersCount' => $this->getUsersCountSince($userRepo, $startDate),
+            'periodLabel' => $this->getPeriodLabel($period),
+        ];
+    }
+
+    private function getStartDateByPeriod(string $period): \DateTime
+    {
+        $date = new \DateTime();
+        
+        switch ($period) {
+            case 'week':
+                $date->modify('monday this week')->setTime(0, 0, 0);
+                break;
+            case 'year':
+                $date->modify('first day of January')->setTime(0, 0, 0);
+                break;
+            case 'month':
+            default:
+                $date->modify('first day of this month')->setTime(0, 0, 0);
+                break;
+        }
+        
+        return $date;
+    }
+
+    private function getPeriodLabel(string $period): string
+    {
+        return match($period) {
+            'week' => 'esta semana',
+            'year' => 'este año',
+            default => 'este mes',
+        };
+    }
+
+    private function getNewsCountSince(NewsRepository $repository, \DateTime $startDate): int
+    {
         return count($repository->createQueryBuilder('n')
             ->where('n.createdAt >= :start')
-            ->setParameter('start', $startOfMonth)
+            ->setParameter('start', $startDate)
             ->getQuery()
             ->getResult());
     }
 
-    private function getCommentsCountThisMonth(CommentRepository $repository): int
+    private function getCommentsCountSince(CommentRepository $repository, \DateTime $startDate): int
     {
-        $startOfMonth = new \DateTime('first day of this month 00:00:00');
         return count($repository->createQueryBuilder('c')
             ->where('c.createdAt >= :start')
-            ->setParameter('start', $startOfMonth)
+            ->setParameter('start', $startDate)
             ->getQuery()
             ->getResult());
     }
 
-    private function getUsersCountThisMonth(UserRepository $repository): int
+    private function getUsersCountSince(UserRepository $repository, \DateTime $startDate): int
     {
-        $startOfMonth = new \DateTime('first day of this month 00:00:00');
         return count($repository->createQueryBuilder('u')
             ->where('u.createdAt >= :start')
-            ->setParameter('start', $startOfMonth)
+            ->setParameter('start', $startDate)
             ->getQuery()
             ->getResult());
     }
