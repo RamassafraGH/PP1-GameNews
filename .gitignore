@@ -13,19 +13,14 @@
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
-
-# Uploads - Mantener estructura pero no las imágenes de usuarios
+# Uploads - Solo excluir fotos de perfil
 /public/uploads/profiles/*
 !public/uploads/profiles/.gitkeep
-!public/uploads/profiles/README.md
 
-# Mantener imágenes predefinidas de noticias en Git
-/public/uploads/news/*
-!public/uploads/news/.gitkeep
+# Incluir TODAS las imágenes de noticias en el repositorio
+# (tanto predefined como las cargadas)
+!public/uploads/news/
+!public/uploads/news/*
 !public/uploads/news/predefined/
 !public/uploads/news/predefined/*
 

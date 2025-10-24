@@ -21,7 +21,7 @@ class SearchFormType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Buscar noticias...',
+                    'placeholder' => 'GTA 6, Zelda, PS5...',
                 ],
             ])
             ->add('category', EntityType::class, [
@@ -54,6 +54,9 @@ class SearchFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            'method' => 'GET',
+            'csrf_protection' => false, // Importante para formularios GET
+        ]);
     }
 }

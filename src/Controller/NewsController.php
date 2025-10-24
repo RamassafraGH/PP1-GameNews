@@ -23,112 +23,135 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/noticias')]
 class NewsController extends AbstractController
 {
-#[Route('/', name: 'app_news_index')]
-public function index(
-    Request $request,
-    NewsRepository $newsRepository,
-    PaginatorInterface $paginator
-): Response {
-    // Crear formulario
-    $searchForm = $this->createForm(SearchFormType::class);
-    $searchForm->handleRequest($request);
+    #[Route('/', name: 'app_news_index')]
+    public function index(
+        Request $request,
+        NewsRepository $newsRepository,
+        CategoryRepository $categoryRepository,
+        TagRepository $tagRepository,
+        PaginatorInterface $paginator
+    ): Response {
+        $hasSearch = false;
+        $appliedFilters = [];
 
-    $hasSearch = false;
-    $appliedFilters = [];
+        // Query base
+        $queryBuilder = $newsRepository->createQueryBuilder('n')
+            ->where('n.status = :status')
+            ->setParameter('status', 'published')
+            ->orderBy('n.publishedAt', 'DESC');
 
-    // Inicializar query builder base
-    $queryBuilder = $newsRepository->createQueryBuilder('n')
-        ->where('n.status = :status')
-        ->setParameter('status', 'published')
-        ->orderBy('n.publishedAt', 'DESC');
+        // Obtener parámetros de búsqueda directamente de la query string
+        $searchQuery = $request->query->get('query', '');
+        $categoryId = $request->query->get('category', '');
+        $tagId = $request->query->get('tag', '');
+        $dateFrom = $request->query->get('dateFrom', '');
+        $dateTo = $request->query->get('dateTo', '');
 
-    // Procesar búsqueda
-    if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-        $data = $searchForm->getData();
-        
-        $query = trim($data['query'] ?? '');
-        $category = $data['category'] ?? null;
-        $tag = $data['tag'] ?? null;
-        $dateFrom = $data['dateFrom'] ?? null;
-        $dateTo = $data['dateTo'] ?? null;
+        // Verificar si hay búsqueda activa
+        $hasSearch = !empty($searchQuery) || !empty($categoryId) || !empty($tagId) || !empty($dateFrom) || !empty($dateTo);
 
-        // Verificar si hay al menos un filtro
-        if (!empty($query) || $category !== null || $tag !== null || $dateFrom !== null || $dateTo !== null) {
-            $hasSearch = true;
-
-            // BÚSQUEDA POR TEXTO
-            if (!empty($query)) {
-                $searchTerm = '%' . $query . '%';
+        if ($hasSearch) {
+            // FILTRO POR TEXTO
+            if (!empty($searchQuery)) {
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->like('n.title', ':searchTerm'),
-                        $queryBuilder->expr()->like('n.subtitle', ':searchTerm'),
-                        $queryBuilder->expr()->like('n.body', ':searchTerm')
+                        'n.title LIKE :search',
+                        'n.subtitle LIKE :search',
+                        'n.body LIKE :search'
                     )
                 )
-                ->setParameter('searchTerm', $searchTerm);
+                ->setParameter('search', '%' . $searchQuery . '%');
                 
-                $appliedFilters[] = 'Texto: "' . $query . '"';
+                $appliedFilters[] = 'Texto: "' . $searchQuery . '"';
             }
 
-            // BÚSQUEDA POR CATEGORÍA
-            if ($category !== null) {
-                $queryBuilder
-                    ->innerJoin('n.categories', 'cat')
-                    ->andWhere('cat.id = :categoryId')
-                    ->setParameter('categoryId', $category->getId());
-                
-                $appliedFilters[] = 'Categoría: ' . $category->getName();
+            // FILTRO POR CATEGORÍA
+            if (!empty($categoryId)) {
+                $category = $categoryRepository->find($categoryId);
+                if ($category) {
+                    $queryBuilder
+                        ->innerJoin('n.categories', 'c')
+                        ->andWhere('c.id = :categoryId')
+                        ->setParameter('categoryId', $categoryId);
+                    
+                    $appliedFilters[] = 'Categoría: ' . $category->getName();
+                }
             }
 
-            // BÚSQUEDA POR ETIQUETA
-            if ($tag !== null) {
-                $queryBuilder
-                    ->innerJoin('n.tags', 'tag')
-                    ->andWhere('tag.id = :tagId')
-                    ->setParameter('tagId', $tag->getId());
-                
-                $appliedFilters[] = 'Etiqueta: ' . $tag->getName();
+            // FILTRO POR ETIQUETA
+            if (!empty($tagId)) {
+                $tag = $tagRepository->find($tagId);
+                if ($tag) {
+                    $queryBuilder
+                        ->innerJoin('n.tags', 't')
+                        ->andWhere('t.id = :tagId')
+                        ->setParameter('tagId', $tagId);
+                    
+                    $appliedFilters[] = 'Etiqueta: ' . $tag->getName();
+                }
             }
 
-            // BÚSQUEDA POR RANGO DE FECHAS
-            if ($dateFrom !== null) {
-                $dateFrom->setTime(0, 0, 0);
-                $queryBuilder
-                    ->andWhere('n.publishedAt >= :dateFrom')
-                    ->setParameter('dateFrom', $dateFrom);
-                
-                $appliedFilters[] = 'Desde: ' . $dateFrom->format('d/m/Y');
+            // FILTRO POR FECHA DESDE
+            if (!empty($dateFrom)) {
+                try {
+                    $dateFromObj = new \DateTime($dateFrom);
+                    $dateFromObj->setTime(0, 0, 0);
+                    $queryBuilder
+                        ->andWhere('n.publishedAt >= :dateFrom')
+                        ->setParameter('dateFrom', $dateFromObj);
+                    
+                    $appliedFilters[] = 'Desde: ' . $dateFromObj->format('d/m/Y');
+                } catch (\Exception $e) {
+                    // Fecha inválida, ignorar
+                }
             }
 
-            if ($dateTo !== null) {
-                $dateTo->setTime(23, 59, 59);
-                $queryBuilder
-                    ->andWhere('n.publishedAt <= :dateTo')
-                    ->setParameter('dateTo', $dateTo);
-                
-                $appliedFilters[] = 'Hasta: ' . $dateTo->format('d/m/Y');
+            // FILTRO POR FECHA HASTA
+            if (!empty($dateTo)) {
+                try {
+                    $dateToObj = new \DateTime($dateTo);
+                    $dateToObj->setTime(23, 59, 59);
+                    $queryBuilder
+                        ->andWhere('n.publishedAt <= :dateTo')
+                        ->setParameter('dateTo', $dateToObj);
+                    
+                    $appliedFilters[] = 'Hasta: ' . $dateToObj->format('d/m/Y');
+                } catch (\Exception $e) {
+                    // Fecha inválida, ignorar
+                }
             }
 
-            // Evitar duplicados cuando se usan joins
+            // Evitar duplicados
             $queryBuilder->distinct();
         }
+
+        // Paginar
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        // Crear formulario solo para mostrar
+        $searchForm = $this->createForm(SearchFormType::class, null, [
+            'action' => $this->generateUrl('app_news_index'),
+            'method' => 'GET',
+        ]);
+
+        return $this->render('news/index.html.twig', [
+            'pagination' => $pagination,
+            'searchForm' => $searchForm->createView(),
+            'hasSearch' => $hasSearch,
+            'appliedFilters' => $appliedFilters,
+            'currentSearch' => [
+                'query' => $searchQuery,
+                'category' => $categoryId,
+                'tag' => $tagId,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+            ],
+        ]);
     }
-
-    // Paginar resultados
-    $pagination = $paginator->paginate(
-        $queryBuilder->getQuery(),
-        $request->query->getInt('page', 1),
-        12
-    );
-
-    return $this->render('news/index.html.twig', [
-        'pagination' => $pagination,
-        'searchForm' => $searchForm->createView(),
-        'hasSearch' => $hasSearch,
-        'appliedFilters' => $appliedFilters,
-    ]);
-}
 
     #[Route('/{slug}', name: 'app_news_show')]
     public function show(

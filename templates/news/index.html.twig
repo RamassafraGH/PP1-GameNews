@@ -5,131 +5,198 @@
 {% block body %}
 <h1 class="mb-4"><i class="bi bi-newspaper"></i> Noticias de Videojuegos</h1>
 
+{# SECCIÓN DE BÚSQUEDA #}
 <div class="card mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="card-title mb-0"><i class="bi bi-search"></i> Buscar Noticias</h5>
             {% if hasSearch %}
-                <a href="{{ path('app_news_index') }}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{ path('app_news_index') }}" class="btn btn-sm btn-warning">
                     <i class="bi bi-x-circle"></i> Limpiar búsqueda
                 </a>
             {% endif %}
         </div>
 
-        {{ form_start(searchForm, {'method': 'GET', 'attr': {'id': 'searchForm'}}) }}
-            <div class="row g-3">
-                <div class="col-12 col-md-6 col-lg-4">
-                    <label class="form-label small">Buscar por texto</label>
-                    {{ form_widget(searchForm.query, {'attr': {'placeholder': 'Título, contenido...'}}) }}
+        <form method="GET" action="{{ path('app_news_index') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-search"></i> Buscar por texto
+                    </label>
+                    <input type="text" 
+                           name="query" 
+                           class="form-control" 
+                           placeholder="GTA 6, Zelda, PS5..." 
+                           value="{{ currentSearch.query }}">
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
-                    <label class="form-label small">Categoría</label>
-                    {{ form_widget(searchForm.category) }}
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-folder"></i> Categoría
+                    </label>
+                    <select name="category" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% for category in searchForm.category.vars.choices %}
+                            <option value="{{ category.value }}" {% if currentSearch.category == category.value %}selected{% endif %}>
+                                {{ category.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
-                    <label class="form-label small">Etiqueta</label>
-                    {{ form_widget(searchForm.tag) }}
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-tag"></i> Etiqueta
+                    </label>
+                    <select name="tag" class="form-select">
+                        <option value="">Todas las etiquetas</option>
+                        {% for tag in searchForm.tag.vars.choices %}
+                            <option value="{{ tag.value }}" {% if currentSearch.tag == tag.value %}selected{% endif %}>
+                                {{ tag.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="col-12 col-md-6 col-lg-2">
-                    <label class="form-label small">&nbsp;</label>
+                <div class="col-12 col-md-6 col-lg-3">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Buscar
                     </button>
                 </div>
             </div>
             
-            <div class="row g-3 mt-2">
+            <div class="row g-3 mt-1">
                 <div class="col-12 col-md-6">
-                    {{ form_label(searchForm.dateFrom, 'Desde', {'label_attr': {'class': 'form-label small'}}) }}
-                    {{ form_widget(searchForm.dateFrom) }}
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-calendar-event"></i> Desde
+                    </label>
+                    <input type="date" 
+                           name="dateFrom" 
+                           class="form-control" 
+                           value="{{ currentSearch.dateFrom }}">
                 </div>
                 <div class="col-12 col-md-6">
-                    {{ form_label(searchForm.dateTo, 'Hasta', {'label_attr': {'class': 'form-label small'}}) }}
-                    {{ form_widget(searchForm.dateTo) }}
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-calendar-event"></i> Hasta
+                    </label>
+                    <input type="date" 
+                           name="dateTo" 
+                           class="form-control" 
+                           value="{{ currentSearch.dateTo }}">
                 </div>
             </div>
-        {{ form_end(searchForm) }}
+        </form>
 
+        {# FILTROS APLICADOS #}
         {% if hasSearch %}
             <div class="alert alert-info mt-3 mb-0">
-                <i class="bi bi-filter"></i> 
-                Mostrando <strong>{{ pagination.getTotalItemCount }}</strong> resultado(s) de búsqueda
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                        <strong><i class="bi bi-funnel-fill"></i> Filtros aplicados:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for filter in appliedFilters %}
+                                <li>{{ filter }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-primary fs-6">
+                            {{ pagination.getTotalItemCount }} resultado(s)
+                        </span>
+                    </div>
+                </div>
             </div>
         {% endif %}
     </div>
 </div>
 
-<div class="row g-4">
-    {% for news in pagination %}
-        <div class="col-12 col-sm-6 col-lg-4">
-            <div class="card h-100">
-                {% if news.featuredImage %}
-                    <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top news-card-img" alt="{{ news.title }}">
-                {% else %}
-                    <div class="card-img-top news-card-img bg-secondary d-flex align-items-center justify-content-center">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #666;"></i>
-                    </div>
-                {% endif %}
-                
-                <div class="card-body">
-                    {% for category in news.categories %}
-                        <span class="category-badge">{{ category.name }}</span>
-                    {% endfor %}
-                    
-                    <h5 class="card-title mt-2">{{ news.title }}</h5>
-                    <p class="card-text text-muted">{{ news.subtitle|default('')|slice(0, 80) }}{% if news.subtitle|length > 80 %}...{% endif %}</p>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="text-muted">
-                            <i class="bi bi-person"></i> {{ news.author.username }}
-                        </small>
-                        <small class="text-muted">
-                            <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y') }}
-                        </small>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="rating-stars">
-                            {% if news.ratingCount > 0 %}
-                                {% for i in 1..5 %}
-                                    <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}" style="color: #fbbf24;"></i>
-                                {% endfor %}
-                                <small>({{ news.ratingCount }})</small>
-                            {% else %}
-                                <small class="text-muted">Sin valoraciones</small>
-                            {% endif %}
-                        </div>
-                        <small class="text-muted">
-                            <i class="bi bi-eye"></i> {{ news.viewCount }}
-                        </small>
-                    </div>
-                </div>
-                
-                <div class="card-footer bg-transparent">
-                    <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="btn btn-primary w-100">
-                        Leer más <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="col-12">
-            <div class="alert alert-warning">
-                <i class="bi bi-info-circle"></i> 
-                {% if hasSearch %}
-                    No se encontraron noticias que coincidan con tu búsqueda.
-                    <a href="{{ path('app_news_index') }}" class="alert-link">Ver todas las noticias</a>
-                {% else %}
-                    No hay noticias publicadas todavía.
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</div>
-
-{% if pagination.getTotalItemCount > 0 %}
-    <div class="mt-4">
-        {{ knp_pagination_render(pagination) }}
+{# RESULTADOS #}
+{% if hasSearch and pagination.getTotalItemCount == 0 %}
+    <div class="alert alert-warning text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+        <h4 class="mt-3">No se encontraron noticias con los filtros aplicados</h4>
+        <p class="text-muted">Intenta con otros términos de búsqueda o</p>
+        <a href="{{ path('app_news_index') }}" class="btn btn-warning">
+            <i class="bi bi-arrow-left"></i> Ver todas las noticias
+        </a>
     </div>
+{% else %}
+    <div class="row g-4">
+        {% for news in pagination %}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100">
+                    <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="text-decoration-none">
+                        {% if news.featuredImage %}
+                            <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" 
+                                 class="card-img-top news-card-img" 
+                                 alt="{{ news.title }}"
+                                 style="cursor: pointer;">
+                        {% else %}
+                            <div class="card-img-top news-card-img bg-secondary d-flex align-items-center justify-content-center" style="cursor: pointer;">
+                                <i class="bi bi-image" style="font-size: 4rem; color: #666;"></i>
+                            </div>
+                        {% endif %}
+                    </a>
+                    
+                    <div class="card-body">
+                        {% for category in news.categories %}
+                            <span class="category-badge">{{ category.name }}</span>
+                        {% endfor %}
+                        
+                        <h5 class="card-title mt-2">
+                            <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="text-decoration-none text-white">
+                                {{ news.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            {{ news.subtitle|default('')|slice(0, 80) }}{% if news.subtitle|length > 80 %}...{% endif %}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ news.author.username }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> {{ news.publishedAt|date('d/m/Y') }}
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="rating-stars">
+                                {% if news.ratingCount > 0 %}
+                                    {% for i in 1..5 %}
+                                        <i class="bi bi-star{% if i <= news.averageRating %}-fill{% endif %}" style="color: #fbbf24;"></i>
+                                    {% endfor %}
+                                    <small>({{ news.ratingCount }})</small>
+                                {% else %}
+                                    <small class="text-muted">Sin valoraciones</small>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi bi-eye"></i> {{ news.viewCount }}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="btn btn-primary w-100">
+                            Leer más <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">No hay noticias publicadas todavía</h4>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# PAGINACIÓN #}
+    {% if pagination.getTotalItemCount > 0 %}
+        <div class="mt-4">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% endif %}
 {% endif %}
 {% endblock %}
