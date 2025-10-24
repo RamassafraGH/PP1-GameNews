@@ -47,7 +47,7 @@ class NewsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Búsqueda mejorada de noticias con filtros
+     * Búsqueda avanzada de noticias con filtros
      */
     public function searchNews(
         ?string $query = null,
@@ -62,36 +62,40 @@ class NewsRepository extends ServiceEntityRepository
 
         // Búsqueda por texto (en título, subtítulo y cuerpo)
         if ($query && trim($query) !== '') {
+            $searchTerm = '%' . trim($query) . '%';
             $qb->andWhere('n.title LIKE :query OR n.subtitle LIKE :query OR n.body LIKE :query')
-               ->setParameter('query', '%' . $query . '%');
+               ->setParameter('query', $searchTerm);
         }
 
         // Filtro por categoría
-        if ($category) {
-            $qb->join('n.categories', 'c')
+        if ($category !== null) {
+            $qb->innerJoin('n.categories', 'c')
                ->andWhere('c.id = :categoryId')
                ->setParameter('categoryId', $category->getId());
         }
 
         // Filtro por etiqueta
-        if ($tag) {
-            $qb->join('n.tags', 't')
+        if ($tag !== null) {
+            $qb->innerJoin('n.tags', 't')
                ->andWhere('t.id = :tagId')
                ->setParameter('tagId', $tag->getId());
         }
 
         // Filtro por rango de fechas
-        if ($dateFrom) {
+        if ($dateFrom !== null) {
             $dateFrom->setTime(0, 0, 0);
             $qb->andWhere('n.publishedAt >= :dateFrom')
                ->setParameter('dateFrom', $dateFrom);
         }
 
-        if ($dateTo) {
+        if ($dateTo !== null) {
             $dateTo->setTime(23, 59, 59);
             $qb->andWhere('n.publishedAt <= :dateTo')
                ->setParameter('dateTo', $dateTo);
         }
+
+        // Asegurar que no haya duplicados cuando se usan joins
+        $qb->distinct();
 
         return $qb->orderBy('n.publishedAt', 'DESC');
     }

@@ -27,26 +27,36 @@ class NewsController extends AbstractController
 public function index(
     Request $request,
     NewsRepository $newsRepository,
-    CategoryRepository $categoryRepository,
-    TagRepository $tagRepository,
     PaginatorInterface $paginator
 ): Response {
     $searchForm = $this->createForm(SearchFormType::class);
     $searchForm->handleRequest($request);
 
     $hasSearch = false;
+    $appliedFilters = [];
+
+    // Query base
     $queryBuilder = $newsRepository->createQueryBuilder('n')
         ->where('n.status = :status')
         ->setParameter('status', 'published')
         ->orderBy('n.publishedAt', 'DESC');
 
-    // Aplicar filtros si hay datos en la búsqueda
-    if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+    // Si el formulario fue enviado
+    if ($searchForm->isSubmitted()) {
         $data = $searchForm->getData();
         
-        // Verificar si al menos un campo tiene valor
-        if (!empty($data['query']) || $data['category'] || $data['tag'] || $data['dateFrom'] || $data['dateTo']) {
+        // Verificar si hay filtros aplicados
+        $hasQuery = !empty(trim($data['query'] ?? ''));
+        $hasCategory = $data['category'] !== null;
+        $hasTag = $data['tag'] !== null;
+        $hasDateFrom = $data['dateFrom'] !== null;
+        $hasDateTo = $data['dateTo'] !== null;
+
+        // Si hay al menos un filtro, marcar como búsqueda activa
+        if ($hasQuery || $hasCategory || $hasTag || $hasDateFrom || $hasDateTo) {
             $hasSearch = true;
+
+            // Aplicar búsqueda avanzada
             $queryBuilder = $newsRepository->searchNews(
                 $data['query'] ?? null,
                 $data['category'] ?? null,
@@ -54,6 +64,27 @@ public function index(
                 $data['dateFrom'] ?? null,
                 $data['dateTo'] ?? null
             );
+
+            // Construir array de filtros aplicados para mostrar
+            if ($hasQuery) {
+                $appliedFilters[] = 'Texto: "' . $data['query'] . '"';
+            }
+            if ($hasCategory) {
+                $appliedFilters[] = 'Categoría: ' . $data['category']->getName();
+            }
+            if ($hasTag) {
+                $appliedFilters[] = 'Etiqueta: ' . $data['tag']->getName();
+            }
+            if ($hasDateFrom || $hasDateTo) {
+                $dateRange = 'Fecha: ';
+                if ($hasDateFrom) {
+                    $dateRange .= 'desde ' . $data['dateFrom']->format('d/m/Y');
+                }
+                if ($hasDateTo) {
+                    $dateRange .= ' hasta ' . $data['dateTo']->format('d/m/Y');
+                }
+                $appliedFilters[] = $dateRange;
+            }
         }
     }
 
@@ -67,9 +98,9 @@ public function index(
         'pagination' => $pagination,
         'searchForm' => $searchForm->createView(),
         'hasSearch' => $hasSearch,
+        'appliedFilters' => $appliedFilters,
     ]);
 }
-
     #[Route('/{slug}', name: 'app_news_show')]
     public function show(
         string $slug,

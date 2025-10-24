@@ -1,73 +1,78 @@
-{% extends 'base.html.twig' %}
+#[Route('/', name: 'app_news_index')]
+public function index(
+    Request $request,
+    NewsRepository $newsRepository,
+    PaginatorInterface $paginator
+): Response {
+    $searchForm = $this->createForm(SearchFormType::class);
+    $searchForm->handleRequest($request);
 
-{% block title %}Gestión de Noticias - GameNews{% endblock %}
+    $hasSearch = false;
+    $appliedFilters = [];
 
-{% block body %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-file-earmark-text"></i> Gestión de Noticias</h1>
-    <a href="{{ path('app_admin_news_new') }}" class="btn btn-primary">
-        <i class="bi bi-plus-lg"></i> Nueva Noticia
-    </a>
-</div>
+    // Query base
+    $queryBuilder = $newsRepository->createQueryBuilder('n')
+        ->where('n.status = :status')
+        ->setParameter('status', 'published')
+        ->orderBy('n.publishedAt', 'DESC');
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-dark table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Autor</th>
-                        <th>Categorías</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for news in pagination %}
-                        <tr>
-                            <td>{{ news.id }}</td>
-                            <td>{{ news.title }}</td>
-                            <td>{{ news.author.username }}</td>
-                            <td>
-                                {% for category in news.categories %}
-                                    <span class="badge bg-secondary">{{ category.name }}</span>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% if news.status == 'published' %}
-                                    <span class="badge bg-success">Publicado</span>
-                                {% else %}
-                                    <span class="badge bg-warning">Borrador</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ news.createdAt|date('d/m/Y') }}</td>
-                            <td>
-                                <a href="{{ path('app_admin_news_edit', {id: news.id}) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_admin_news_delete', {id: news.id}) }}" style="display: inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ news.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de eliminar esta noticia?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">No hay noticias registradas</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    // Si el formulario fue enviado
+    if ($searchForm->isSubmitted()) {
+        $data = $searchForm->getData();
+        
+        // Verificar si hay filtros aplicados
+        $hasQuery = !empty(trim($data['query'] ?? ''));
+        $hasCategory = $data['category'] !== null;
+        $hasTag = $data['tag'] !== null;
+        $hasDateFrom = $data['dateFrom'] !== null;
+        $hasDateTo = $data['dateTo'] !== null;
 
-        <div class="mt-3">
-            {{ knp_pagination_render(pagination) }}
-        </div>
-    </div>
-</div>
-{% endblock %}
+        // Si hay al menos un filtro, marcar como búsqueda activa
+        if ($hasQuery || $hasCategory || $hasTag || $hasDateFrom || $hasDateTo) {
+            $hasSearch = true;
+
+            // Aplicar búsqueda avanzada
+            $queryBuilder = $newsRepository->searchNews(
+                $data['query'] ?? null,
+                $data['category'] ?? null,
+                $data['tag'] ?? null,
+                $data['dateFrom'] ?? null,
+                $data['dateTo'] ?? null
+            );
+
+            // Construir array de filtros aplicados para mostrar
+            if ($hasQuery) {
+                $appliedFilters[] = 'Texto: "' . $data['query'] . '"';
+            }
+            if ($hasCategory) {
+                $appliedFilters[] = 'Categoría: ' . $data['category']->getName();
+            }
+            if ($hasTag) {
+                $appliedFilters[] = 'Etiqueta: ' . $data['tag']->getName();
+            }
+            if ($hasDateFrom || $hasDateTo) {
+                $dateRange = 'Fecha: ';
+                if ($hasDateFrom) {
+                    $dateRange .= 'desde ' . $data['dateFrom']->format('d/m/Y');
+                }
+                if ($hasDateTo) {
+                    $dateRange .= ' hasta ' . $data['dateTo']->format('d/m/Y');
+                }
+                $appliedFilters[] = $dateRange;
+            }
+        }
+    }
+
+    $pagination = $paginator->paginate(
+        $queryBuilder,
+        $request->query->getInt('page', 1),
+        12
+    );
+
+    return $this->render('news/index.html.twig', [
+        'pagination' => $pagination,
+        'searchForm' => $searchForm->createView(),
+        'hasSearch' => $hasSearch,
+        'appliedFilters' => $appliedFilters,
+    ]);
+}
