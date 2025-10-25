@@ -12,7 +12,7 @@
 
                 <div class="card mb-4">
                     {% if news.featuredImage %}
-                        <img src="{{ asset('uploads/news/' ~ news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
+                        <img src="{{ asset('uploads/news/predefined/' ~ news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
                     {% endif %}
                     
                     <div class="card-body">
