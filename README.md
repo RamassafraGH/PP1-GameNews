@@ -7,11 +7,11 @@
 
 Portal web completo para publicación y gestión de noticias sobre videojuegos, desarrollado con Symfony 6.4 como proyecto académico.
 
-## 📋 Descripción
+## Descripción
 
 GameNews es una plataforma web moderna que permite a los usuarios leer, comentar y valorar noticias sobre videojuegos. Cuenta con un sistema completo de administración, roles de usuario, y funcionalidades avanzadas de búsqueda y filtrado.
 
-## ✨ Características Principales
+## Características Principales
 
 ### Para Usuarios (Lectores)
 - 📰 Explorar noticias publicadas con sistema de paginación
@@ -40,7 +40,7 @@ GameNews es una plataforma web moderna que permite a los usuarios leer, comentar
 - 🔐 Asignación y gestión de roles
 - 📉 Métricas de actividad y engagement
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 ### Backend
 - **Framework:** Symfony 6.4
@@ -56,7 +56,7 @@ GameNews es una plataforma web moderna que permite a los usuarios leer, comentar
 - **Plantillas:** Twig
 - **JavaScript:** Vanilla JS (votaciones AJAX)
 
-## 📦 Instalación
+## Instalación
 
 ### Requisitos Previos
 - PHP 8.2 o superior
@@ -112,7 +112,7 @@ php -S localhost:8000 -t public
 8. **Acceder a la aplicación**
 - URL: `http://localhost:8000`
 
-## 👥 Usuarios de Prueba
+## Usuarios de Prueba
 
 Si cargaste los fixtures, puedes usar:
 
@@ -122,7 +122,7 @@ Si cargaste los fixtures, puedes usar:
 |  editor@gamenews.com  | Editor123  | Editor        |
 |  usuario@gamenews.com | Usuario123 | Usuario       |
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 ```
 PP1-GameNews/
 ├── config/              # Configuración de Symfony
@@ -145,7 +145,7 @@ PP1-GameNews/
 └── var/                 # Cache y logs
 ```
 
-## 🎯 Casos de Uso Implementados
+## Casos de Uso Implementados
 
 - **CU00:** Página Principal
 - **CU01:** Registrarse
@@ -162,7 +162,7 @@ PP1-GameNews/
 - **CU14:** Editar etiquetas
 - **CU20:** Ver noticia
 
-## 🔐 Sistema de Roles
+# Sistema de Roles
 
 ### Jerarquía de Roles
 ```
@@ -195,7 +195,7 @@ ROLE_ADMIN (Administrador)
 - Asignar roles
 - Acceso completo al sistema
 
-## 🔧 Comandos Útiles
+## Comandos Útiles
 
 ### Gestión de Usuarios
 ```bash
@@ -227,18 +227,18 @@ php bin/console cache:clear
 php bin/console cache:clear --env=prod
 ```
 
-## 📸 Capturas de Pantalla
+## Capturas de Pantalla
 
 ### Página Principal
-![Home](docs/images/home.png)
+![Home](public/uploads/docs/home.png)
 
 ### Sistema de Búsqueda
-![Search](docs/images/search.png)
+![Search](public/uploads/docs/search.png)
 
 ### Panel de Administración
-![Admin](docs/images/admin.png)
+![Admin](public/uploads/docs/admin.png)
 
-## 🐛 Solución de Problemas
+## Solución de Problemas
 
 ### Error: "No route found"
 ```bash
@@ -253,18 +253,18 @@ chmod -R 777 public/uploads
 ### Error de base de datos
 Verificar que MySQL esté corriendo y las credenciales sean correctas en `.env`
 
-## 👨‍💻 Equipo de Desarrollo
+## Equipo de Desarrollo
 
 - **Taiel Giuliano**
 - **Agustin Ifran Sanchez**
 - **Ramiro Massafra**
 - **Benjamin Zurbriggen**
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es un trabajo académico desarrollado para fines educativos.
 
-## 🔗 Enlaces
+## Enlaces
 
 - **Repositorio:** https://github.com/RamassafraGH/PP1-GameNews.git
 - **Documentación Symfony:** https://symfony.com/doc/current/index.html
