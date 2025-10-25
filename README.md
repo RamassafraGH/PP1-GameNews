@@ -230,13 +230,13 @@ php bin/console cache:clear --env=prod
 ## Capturas de Pantalla
 
 ### Página Principal
-![Home](uploads/docs/home.png)
+![Home](docs/home.png)
 
 ### Sistema de Búsqueda
-![Search](uploads/docs/search.png)
+![Search](docs/search.png)
 
 ### Panel de Administración
-![Admin](uploads/docs/admin.png)
+![Admin](docs/admin.png)
 
 ## Solución de Problemas
 
