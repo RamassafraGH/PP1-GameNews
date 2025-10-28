@@ -8,6 +8,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class CategoryRepository extends ServiceEntityRepository
 {
+    /**
+     * CategoryRepository
+     *
+     * Repositorio de categorías con métodos auxiliares:
+     * - `findAllOrdered()` para listar categorías ordenadas (útil en selects)
+     * - `findBySlug()` para resolver rutas por slug
+     * - `countNewsInCategory()` para estadísticas en el admin o vistas.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Category::class);

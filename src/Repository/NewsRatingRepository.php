@@ -10,6 +10,15 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class NewsRatingRepository extends ServiceEntityRepository
 {
+    /**
+     * NewsRatingRepository
+     *
+     * Repositorio para gestionar valoraciones de noticias. Métodos útiles:
+     * - `findUserRatingForNews(User, News)` devuelve la valoración de un usuario
+     *    para una noticia concreta (o null).
+     * - `calculateAverageRating(News)` devuelve el promedio para actualizar
+     *    el campo en la entidad `News`.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, NewsRating::class);

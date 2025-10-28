@@ -1,3 +1,30 @@
+{#
+/**
+ * templates/registration/register.html.twig
+ * Formulario de registro de usuarios
+ *
+ * Esta plantilla implementa el formulario de registro con:
+ * 1. Campos obligatorios:
+ *    - Email (validación de formato)
+ *    - Username (3-20 caracteres, alfanumérico)
+ *    - Contraseña (con confirmación)
+ * 2. Campos opcionales:
+ *    - Suscripción al boletín
+ *    - Aceptación de términos
+ *
+ * Características:
+ * - Validación en tiempo real
+ * - Mensajes de error personalizados
+ * - Ayudas visuales para requisitos
+ * - Estilo Bootstrap responsivo
+ *
+ * Formulario:
+ * - registrationForm: Form\RegistrationFormType
+ *   - email: campo de correo
+ *   - username: nombre de usuario
+ *   - plainPassword: contraseña con confirmación
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Registro - GameNews{% endblock %}

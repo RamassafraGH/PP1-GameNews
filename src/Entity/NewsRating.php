@@ -10,6 +10,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'user_news_unique', columns: ['user_id', 'news_id'])]
 class NewsRating
 {
+    /**
+     * Entity NewsRating
+     *
+     * Representa la valoración (rating) que un usuario da a una noticia.
+     * Campos:
+     * - rating (1..5), createdAt
+     * Relaciones:
+     * - user (ManyToOne -> User)
+     * - news (ManyToOne -> News)
+     *
+     * Nota: existe una restricción única (user_id, news_id) para evitar votos
+     * duplicados por el mismo usuario.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

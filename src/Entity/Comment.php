@@ -12,6 +12,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
+    /**
+     * Entity Comment
+     *
+     * Representa un comentario en una noticia. Campos importantes:
+     * - content, createdAt, updatedAt
+     * - isApproved (control de moderación)
+     * - likesCount, dislikesCount
+     *
+     * Relaciones:
+     * - author (ManyToOne -> User)
+     * - news (ManyToOne -> News)
+     * - votes (OneToMany -> CommentVote)
+     * - reports (OneToMany -> Report)
+     *
+     * En la demo: explicar cómo se persisten comentarios y cómo los votos
+     * actualizan los contadores (likes/dislikes) mediante `CommentVote`.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

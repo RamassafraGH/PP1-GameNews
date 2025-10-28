@@ -8,6 +8,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class TagRepository extends ServiceEntityRepository
 {
+    /**
+     * TagRepository
+     *
+     * Repositorio de etiquetas (tags). Métodos:
+     * - `findAllOrdered()` para listados
+     * - `findBySlug()` para resolver rutas
+     * - `countNewsInTag()` para estadísticas o badges
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Tag::class);

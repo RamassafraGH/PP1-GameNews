@@ -11,6 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagFormType extends AbstractType
 {
+    /**
+     * TagFormType
+     *
+     * Formulario para crear/editar etiquetas (tags). Incluye sinónimos para
+     * facilitar búsquedas relacionadas.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

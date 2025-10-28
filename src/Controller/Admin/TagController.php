@@ -15,6 +15,28 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/admin/etiquetas')]
 #[IsGranted('ROLE_EDITOR')]
+/**
+ * Controlador para la gestión de etiquetas (tags)
+ *
+ * Este controlador maneja todas las operaciones CRUD relacionadas
+ * con las etiquetas de las noticias:
+ * - Listado ordenado de etiquetas
+ * - Creación de nuevas etiquetas
+ * - Edición de etiquetas existentes
+ * - Eliminación de etiquetas
+ *
+ * Características:
+ * - Generación automática de slugs
+ * - Validación de nombres únicos
+ * - Gestión de relaciones con noticias
+ * - Control de acceso por roles
+ *
+ * Seguridad:
+ * - Requiere ROLE_EDITOR
+ * - Validación de formularios
+ * - Protección CSRF
+ * - Verificación de relaciones antes de eliminar
+ */
 class TagController extends AbstractController
 {
     #[Route('/', name: 'app_admin_tag_index')]
@@ -27,6 +49,24 @@ class TagController extends AbstractController
         ]);
     }
 
+    /**
+     * Crea una nueva etiqueta
+     *
+     * Este método implementa el proceso de creación de etiquetas:
+     * 1. Genera el formulario para datos de la etiqueta
+     * 2. Procesa la submisión y valida datos
+     * 3. Genera un slug único para la URL
+     * 4. Persiste la nueva etiqueta
+     *
+     * Validaciones:
+     * - Nombre único de etiqueta
+     * - Slug único generado
+     * - Campos requeridos completos
+     *
+     * @param Request $request Para procesar el formulario
+     * @param EntityManagerInterface $entityManager Para persistir la etiqueta
+     * @param SluggerInterface $slugger Para generar URLs amigables
+     */
     #[Route('/nueva', name: 'app_admin_tag_new')]
     public function new(
         Request $request,

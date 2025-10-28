@@ -9,6 +9,15 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class CommentRepository extends ServiceEntityRepository
 {
+    /**
+     * CommentRepository
+     *
+     * Repositorio para comentarios. Métodos principales:
+     * - `findApprovedByNews(News)` retorna comentarios aprobados para mostrar
+     *   en la vista pública.
+     * - `findPendingModeration()` se usa por el panel de moderación para listar
+     *   comentarios que requieren revisión.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Comment::class);

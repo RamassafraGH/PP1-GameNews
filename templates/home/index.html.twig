@@ -1,3 +1,27 @@
+{#
+/**
+ * templates/home/index.html.twig
+ * Página principal de GameNews
+ *
+ * Esta plantilla implementa la página de inicio del portal.
+ * Estructura:
+ * 1. Hero Section: Sección principal con título y CTA
+ * 2. Noticias Destacadas: Grid responsive de noticias destacadas
+ *
+ * Variables Twig esperadas:
+ * - featuredNews: array de objetos News con las noticias destacadas
+ *   Campos utilizados:
+ *   - slug: URL amigable de la noticia
+ *   - featuredImage: imagen destacada
+ *   - title: título de la noticia
+ *   - excerpt: resumen corto
+ *
+ * Rutas utilizadas:
+ * - app_news_index: listado completo de noticias
+ * - app_news_show: vista detallada de una noticia
+ */
+#}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}GameNews - Portal de Noticias sobre Videojuegos{% endblock %}

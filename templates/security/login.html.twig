@@ -1,3 +1,29 @@
+{#
+/**
+ * templates/security/login.html.twig
+ * Formulario de inicio de sesión
+ *
+ * Esta plantilla implementa el formulario de autenticación:
+ * 1. Campos del formulario:
+ *    - Correo electrónico (como username)
+ *    - Contraseña
+ *    - Recordar sesión (checkbox)
+ * 2. Manejo de errores:
+ *    - Mensajes de error traducidos
+ *    - Retención del último username
+ *    - Validación de campos
+ *
+ * Características de seguridad:
+ * - Token CSRF automático
+ * - Protección contra fuerza bruta
+ * - Redireccionamiento seguro
+ *
+ * Variables Twig:
+ * - error: objeto Error de autenticación
+ * - last_username: último email utilizado
+ * - csrf_token: token de protección CSRF
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Iniciar Sesión - GameNews{% endblock %}

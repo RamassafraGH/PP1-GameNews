@@ -9,6 +9,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
+    /**
+     * HomeController
+     *
+     * Controlador para la página principal (home). Muestra noticias destacadas
+     * utilizando `NewsRepository::findFeaturedNews()` y renderiza la plantilla
+     * `home/index.html.twig`.
+     *
+     * En la demo úsalo como punto de entrada para mostrar la UI y navegar al
+     * listado de noticias.
+     */
     #[Route('/', name: 'app_home')]
     public function index(NewsRepository $newsRepository): Response
     {

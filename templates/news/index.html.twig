@@ -1,3 +1,12 @@
+{#
+    templates/news/index.html.twig
+
+    Plantilla que renderiza el listado de noticias (CU05). Puntos clave:
+    - El bucle `for news in pagination` muestra cada tarjeta de noticia.
+    - La imagen y el título están envueltos en un enlace a `app_news_show`.
+    - Los filtros son enviados por GET y preservados en `currentSearch`.
+#}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Noticias - GameNews{% endblock %}

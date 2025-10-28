@@ -1,3 +1,33 @@
+{#
+/**
+ * templates/report/comment.html.twig
+ * Formulario de denuncia de comentarios
+ *
+ * Esta plantilla implementa el sistema de reportes de comentarios:
+ * 1. Visualización del comentario reportado:
+ *    - Contenido del comentario
+ *    - Autor y fecha
+ *    - Contexto (noticia)
+ * 2. Formulario de reporte:
+ *    - Motivo de la denuncia
+ *    - Descripción detallada
+ *    - Información adicional
+ *
+ * Variables Twig:
+ * - comment: Comentario siendo reportado
+ *   - author: Usuario autor del comentario
+ *   - createdAt: Fecha de creación
+ *   - content: Contenido del comentario
+ * - reportForm: Formulario de denuncia
+ *   - reason: Motivo predefinido
+ *   - details: Descripción adicional
+ *
+ * Seguridad:
+ * - Requiere usuario autenticado
+ * - Protección CSRF
+ * - Validación de motivos válidos
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Denunciar Comentario - GameNews{% endblock %}

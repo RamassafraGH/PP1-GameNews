@@ -11,6 +11,14 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    /**
+     * UserRepository
+     *
+     * Repositorio de usuarios. Contiene helper methods:
+     * - `upgradePassword()` necesario para la interfaz `PasswordUpgraderInterface`.
+     * - `findByEmailOrUsername()` para login con email o username.
+     * - `findActiveSubscribers()` para obtener usuarios suscritos al boletín.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);

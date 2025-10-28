@@ -14,6 +14,17 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/comentarios')]
 class CommentController extends AbstractController
 {
+    /**
+     * CommentController
+     *
+     * Gestiona la lógica de votos sobre comentarios. Se encarga de recibir
+     * peticiones AJAX (POST) para agregar/cambiar/eliminar votos y de actualizar
+     * los contadores en la entidad `Comment`.
+     *
+     * Relación con CU07 (comentar) y CU09 (votar comentario): el formulario de
+     * comentario se procesa en el controlador de noticias, mientras que los
+     * votos se gestionan aquí como acciones independientes.
+     */
     #[Route('/{id}/votar', name: 'app_comment_vote', methods: ['POST'])]
     public function vote(
         int $id,

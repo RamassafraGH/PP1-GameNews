@@ -13,6 +13,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchFormType extends AbstractType
 {
+    /**
+     * SearchFormType
+     *
+     * Formulario para búsquedas y filtros en el listado de noticias. Usa
+     * `method => GET` y `csrf_protection => false` porque los filtros se pasan
+     * por la query string.
+     *
+     * En la demo: explica cómo los formularios pueden servir solo para
+     * renderizar y recoger parámetros de búsqueda sin persistir datos.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

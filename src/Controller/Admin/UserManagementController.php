@@ -14,6 +14,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/usuarios')]
 #[IsGranted('ROLE_ADMIN')]
+/**
+ * Controlador para la gestión de usuarios del sistema
+ *
+ * Este controlador maneja todas las operaciones administrativas
+ * relacionadas con los usuarios:
+ * - Listado de usuarios del sistema
+ * - Activación/desactivación de cuentas
+ * - Gestión de roles y permisos
+ * - Monitoreo de actividad
+ *
+ * Características principales:
+ * - Listado paginado de usuarios
+ * - Acciones administrativas sobre cuentas
+ * - Control de estado de usuarios
+ * - Protección contra acciones no autorizadas
+ *
+ * Seguridad:
+ * - Acceso exclusivo para ROLE_ADMIN
+ * - Protección CSRF en todas las acciones
+ * - Registro de cambios de estado
+ * - Validación de permisos jerárquicos
+ */
 class UserManagementController extends AbstractController
 {
     #[Route('/', name: 'app_admin_users_index')]
@@ -36,6 +58,28 @@ class UserManagementController extends AbstractController
         ]);
     }
 
+    /**
+     * Cambia el estado de activación de un usuario
+     *
+     * Este método implementa un toggle del estado de la cuenta:
+     * - Si está activa -> la desactiva
+     * - Si está inactiva -> la activa
+     *
+     * Características:
+     * - Método POST obligatorio
+     * - Protección CSRF por usuario
+     * - Mensajes flash personalizados
+     * - Actualización inmediata
+     *
+     * Seguridad:
+     * - Validación de token CSRF
+     * - Solo accesible para administradores
+     * - Protección contra auto-desactivación
+     *
+     * @param User $user El usuario a modificar (inyectado por ParamConverter)
+     * @param Request $request Para validar token CSRF
+     * @param EntityManagerInterface $entityManager Para persistir cambios
+     */
     #[Route('/{id}/cambiar-estado', name: 'app_admin_users_toggle_status', methods: ['POST'])]
     public function toggleStatus(
         User $user,

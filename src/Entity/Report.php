@@ -9,6 +9,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ReportRepository::class)]
 class Report
 {
+    /**
+     * Entity Report
+     *
+     * Representa una denuncia/flag realizada por un usuario sobre un comentario.
+     * Campos: reason, description, status, createdAt, resolvedAt.
+     * Relaciones: reporter (User), comment (Comment).
+     *
+     * En la demo: explica el ciclo de vida de una denuncia (pending -> resolved)
+     * y cómo el administrador podría procesarlas desde un panel.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

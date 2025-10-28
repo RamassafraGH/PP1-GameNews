@@ -1,3 +1,33 @@
+            {#
+/**
+ * templates/news/show.html.twig
+ * Vista detallada de una noticia individual
+ *
+ * Esta plantilla implementa la vista completa de una noticia con todas sus características:
+ * 1. Cabecera: Imagen destacada, título, categorías y tags
+ * 2. Contenido: Texto completo de la noticia
+ * 3. Sistema de valoración: Interfaz para votar la noticia (requiere JS)
+ * 4. Sistema de comentarios:
+ *    - Lista de comentarios existentes
+ *    - Formulario para nuevo comentario (usuarios autenticados)
+ *    - Sistema de votos para comentarios (AJAX)
+ *
+ * Variables Twig esperadas:
+ * - news: objeto News con la noticia completa
+ *   - title, content, featuredImage, categories, tags
+ * - commentForm: formulario para nuevos comentarios
+ * - comments: colección de comentarios existentes
+ *
+ * JavaScript requerido:
+ * - vote.js: Maneja las interacciones AJAX para votos
+ * - comments.js: Gestiona la interacción con comentarios
+ *
+ * Rutas utilizadas:
+ * - app_news_index: volver al listado de noticias
+ * - app_news_vote: endpoint AJAX para votar
+ */
+#}
+
             {% extends 'base.html.twig' %}
 
             {% block title %}{{ news.title }} - GameNews{% endblock %}

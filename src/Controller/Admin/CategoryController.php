@@ -15,6 +15,26 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/admin/categorias')]
 #[IsGranted('ROLE_EDITOR')]
+/**
+ * Controlador para la gestión de categorías
+ *
+ * Gestiona todas las operaciones CRUD para las categorías de noticias:
+ * - Listado de categorías ordenado
+ * - Creación de nuevas categorías
+ * - Edición de categorías existentes
+ * - Eliminación de categorías (con validación)
+ *
+ * Características:
+ * - Generación automática de slugs
+ * - Validación de nombres únicos
+ * - Control de acceso basado en roles
+ * - Gestión de relaciones con noticias
+ *
+ * Seguridad:
+ * - Requiere ROLE_EDITOR como mínimo
+ * - Validación de formularios
+ * - Protección CSRF
+ */
 class CategoryController extends AbstractController
 {
     #[Route('/', name: 'app_admin_category_index')]
@@ -27,6 +47,24 @@ class CategoryController extends AbstractController
         ]);
     }
 
+    /**
+     * Crea una nueva categoría
+     *
+     * Este método maneja el proceso de creación de categorías:
+     * 1. Genera un formulario para los datos
+     * 2. Procesa la submisión del formulario
+     * 3. Genera un slug único para la URL
+     * 4. Persiste la nueva categoría
+     *
+     * Validaciones:
+     * - Nombre único de categoría
+     * - Generación de slug seguro
+     * - Campos requeridos completos
+     *
+     * @param Request $request Para procesar el formulario
+     * @param EntityManagerInterface $entityManager Para persistir la categoría
+     * @param SluggerInterface $slugger Para generar URLs amigables
+     */
     #[Route('/nueva', name: 'app_admin_category_new')]
     public function new(
         Request $request,

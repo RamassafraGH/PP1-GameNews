@@ -1,3 +1,32 @@
+{#
+/**
+ * templates/admin/dashboard/index.html.twig
+ * Panel de Control Administrativo
+ *
+ * Esta plantilla implementa el dashboard principal del área administrativa.
+ * Adapta su contenido según el rol del usuario (Admin/Editor):
+ *
+ * 1. Gestión de Contenido (Todos):
+ *    - Noticias: Crear, editar, gestionar estado
+ *    - Categorías: Administración de categorías
+ *    - Tags: Gestión de etiquetas
+ *
+ * 2. Administración del Sistema (Solo Admin):
+ *    - Usuarios: Gestión de cuentas y roles
+ *    - Moderación: Reportes y comentarios
+ *    - Newsletter: Gestión de suscripciones
+ *
+ * Variables Twig esperadas:
+ * - isAdmin: boolean, true si el usuario es administrador
+ * - publishedNews: int, cantidad de noticias publicadas
+ * - totalUsers: int, número total de usuarios (admin)
+ * - pendingReports: int, reportes sin resolver (admin)
+ *
+ * Seguridad:
+ * - Requiere rol ROLE_EDITOR o ROLE_ADMIN
+ * - Secciones administrativas solo visibles para ROLE_ADMIN
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Panel de {% if isAdmin %}Administración{% else %}Editor{% endif %} - GameNews{% endblock %}

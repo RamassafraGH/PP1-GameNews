@@ -1,3 +1,32 @@
+{#
+/**
+ * templates/admin/news/index.html.twig
+ * Gestión de Noticias (Área Administrativa)
+ *
+ * Esta plantilla implementa la interfaz de gestión de noticias para administradores y editores.
+ * Funcionalidades:
+ * 1. Listado de noticias:
+ *    - ID y título
+ *    - Autor y categorías
+ *    - Estado de publicación
+ *    - Fecha de creación/actualización
+ * 2. Acciones disponibles:
+ *    - Crear nueva noticia
+ *    - Editar noticia existente
+ *    - Cambiar estado (publicar/despublicar)
+ *    - Eliminar noticia
+ *
+ * Variables Twig esperadas:
+ * - news: Colección paginada de objetos News
+ *   - id, title, author, categories, status, createdAt
+ * - isAdmin: boolean, determina permisos adicionales
+ *
+ * Componentes utilizados:
+ * - Tabla responsive con Bootstrap
+ * - Iconos de Bootstrap Icons
+ * - Sistema de paginación KnpPaginator
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Gestión de Noticias - GameNews{% endblock %}

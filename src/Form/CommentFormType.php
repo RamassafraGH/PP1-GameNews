@@ -10,6 +10,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CommentFormType extends AbstractType
 {
+    /**
+     * CommentFormType
+     *
+     * Formulario simple para publicar un comentario. Mapea directamente la
+     * propiedad `content` en la entidad `Comment`.
+     *
+     * En la demo: muestra validación mínima y cómo el formulario se procesa
+     * en `NewsController::show()`.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

@@ -15,8 +15,46 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/boletin')]
 #[IsGranted('ROLE_EDITOR')]
+/**
+ * Controlador para la gestión del boletín de noticias
+ *
+ * Este controlador maneja toda la funcionalidad relacionada con
+ * el boletín de noticias (newsletter):
+ * - Gestión de suscriptores
+ * - Envío de boletines
+ * - Estadísticas de suscripción
+ *
+ * Características principales:
+ * - Lista de suscriptores activos
+ * - Envío de boletines con noticias recientes
+ * - Gestión de preferencias de suscripción
+ * - Seguimiento de envíos
+ *
+ * Seguridad:
+ * - Acceso restringido a editores
+ * - Protección de datos de suscriptores
+ * - Validación de correos electrónicos
+ */
 class NewsletterController extends AbstractController
 {
+    /**
+     * Lista todos los suscriptores activos del boletín
+     *
+     * Muestra un listado paginado de usuarios que:
+     * 1. Están suscritos al boletín
+     * 2. Tienen cuentas activas
+     * 3. Están ordenados por fecha de suscripción
+     *
+     * Características:
+     * - Paginación (20 suscriptores por página)
+     * - Filtrado automático de cuentas inactivas
+     * - Ordenamiento por fecha de registro
+     * - Acceso a datos de contacto
+     *
+     * @param Request $request Para manejar la paginación
+     * @param UserRepository $userRepository Para consultar suscriptores
+     * @param PaginatorInterface $paginator Para paginar resultados
+     */
     #[Route('/suscriptores', name: 'app_admin_newsletter_subscribers')]
     public function subscribers(
         Request $request,

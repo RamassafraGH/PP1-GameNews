@@ -1,3 +1,34 @@
+{#
+/**
+ * templates/profile/edit.html.twig
+ * Formulario de edición de perfil de usuario
+ *
+ * Esta plantilla implementa la interfaz de edición de perfil con:
+ * 1. Campos editables:
+ *    - Username (nombre de usuario)
+ *    - Imagen de perfil (con previsualización)
+ *
+ * 2. Restricciones de archivos:
+ *    - Tamaño máximo: 2MB
+ *    - Formatos permitidos: JPG, PNG
+ *    - Dimensiones: hasta 500x500px
+ *
+ * 3. Elementos de interfaz:
+ *    - Previsualización de imagen actual
+ *    - Botones de acción (guardar/cancelar)
+ *    - Mensajes de ayuda y validación
+ *
+ * Variables Twig:
+ * - profileForm: Form\ProfileFormType
+ *   - username: campo de nombre de usuario
+ *   - profileImageFile: campo de subida de imagen
+ *
+ * Seguridad:
+ * - Requiere usuario autenticado
+ * - Validación de tipos de archivo
+ * - Protección CSRF en formulario
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Editar Perfil - GameNews{% endblock %}

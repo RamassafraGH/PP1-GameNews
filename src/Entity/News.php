@@ -12,6 +12,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: NewsRepository::class)]
 class News
 {
+    /**
+     * Entity News
+     *
+     * Representa una noticia. Campos clave:
+     * - id, title, subtitle, body, slug
+     * - featuredImage: nombre de archivo subido
+     * - status: 'draft'|'published' -> controlar visibilidad
+     * - createdAt, publishedAt, updatedAt
+     * - viewCount, averageRating, ratingCount
+     *
+     * Relaciones importantes:
+     * - author (ManyToOne -> User)
+     * - categories (ManyToMany -> Category)
+     * - tags (ManyToMany -> Tag)
+     * - comments (OneToMany -> Comment)
+     * - ratings (OneToMany -> NewsRating)
+     *
+     * Mostrar en la demo: el uso de métodos como `incrementViewCount()` y
+     * `isPublished()` para controlar lógica de presentación.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

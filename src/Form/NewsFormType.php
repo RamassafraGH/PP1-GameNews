@@ -17,6 +17,17 @@ use Symfony\Component\Validator\Constraints\Image;
 
 class NewsFormType extends AbstractType
 {
+    /**
+     * NewsFormType
+     *
+     * Formulario para crear y editar noticias. Incluye campos para el título,
+     * subtítulo, cuerpo, selección de categorías/etiquetas, imagen destacada
+     * (campo no mapeado) y estado (borrador/publicado).
+     *
+     * En la demo: mostrar cómo las relaciones ManyToMany (categories/tags)
+     * se representan y cómo `mapped => false` permite manejar archivos
+     * manualmente en el controlador.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

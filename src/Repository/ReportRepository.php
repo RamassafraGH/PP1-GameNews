@@ -8,6 +8,12 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ReportRepository extends ServiceEntityRepository
 {
+    /**
+     * ReportRepository
+     *
+     * Repositorio para denuncias. Método principal:
+     * - `findPendingReports()` para listar denuncias pendientes de revisión.
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Report::class);

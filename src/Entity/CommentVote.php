@@ -9,6 +9,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'user_comment_unique', columns: ['user_id', 'comment_id'])]
 class CommentVote
 {
+    /**
+     * Entity CommentVote
+     *
+     * Representa el voto de un usuario sobre un comentario. El campo
+     * `voteType` almacena 'like' o 'dislike'.
+     *
+     * Tiene una restricción única (user_id, comment_id) para prevenir votos
+     * duplicados.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

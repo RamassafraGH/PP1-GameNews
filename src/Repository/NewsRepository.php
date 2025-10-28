@@ -8,6 +8,22 @@ use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * NewsRepository
+ *
+ * Repositorio con consultas específicas para la entidad `News`.
+ * Contiene métodos usados por los controladores para listar, buscar y
+ * obtener noticias por identificadores legibles (slug).
+ *
+ * Puntos para explicar en la demo:
+ * - `findPublishedNews()` devuelve noticias publicadas ordenadas por fecha.
+ * - `findFeaturedNews()` usa promedio de valoraciones y vistas para destacar.
+ * - `findBySlug()` es utilizado por `NewsController::show()` para resolver
+ *    la noticia por su slug (URL amigable).
+ * - `searchNews()` construye un QueryBuilder reutilizable con filtros: texto,
+ *    categoría, etiqueta y rango de fechas. Retorna el QueryBuilder para permitir
+ *    paginación externa.
+ */
 class NewsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

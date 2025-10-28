@@ -11,6 +11,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CategoryFormType extends AbstractType
 {
+    /**
+     * CategoryFormType
+     *
+     * Formulario para crear/editar categorías. Campos básicos: name y
+     * description. Ideal para mostrar cómo se validan entidades con
+     * `UniqueEntity` en el `Category`.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

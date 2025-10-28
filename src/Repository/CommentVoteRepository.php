@@ -10,6 +10,13 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class CommentVoteRepository extends ServiceEntityRepository
 {
+    /**
+     * CommentVoteRepository
+     *
+     * Repositorio para gestionar los votos de comentarios. Contiene métodos
+     * como `findUserVoteForComment(User, Comment)` que permiten verificar si
+     * un usuario ya votó un comentario (lógica usada por `CommentController`).
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CommentVote::class);

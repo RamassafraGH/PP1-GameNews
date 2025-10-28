@@ -1,3 +1,29 @@
+{#
+/**
+ * templates/profile/index.html.twig
+ * Vista del perfil de usuario
+ *
+ * Esta plantilla muestra el perfil del usuario actual con sus datos y acciones disponibles:
+ * 1. Información básica:
+ *    - Imagen de perfil (con fallback a icono por defecto)
+ *    - Nombre de usuario
+ *    - Email
+ * 2. Acciones disponibles:
+ *    - Editar perfil
+ *    - Gestionar suscripción al boletín
+ * 3. Estadísticas y actividad:
+ *    - Noticias publicadas
+ *    - Comentarios realizados
+ *
+ * Seguridad:
+ * - Requiere usuario autenticado
+ * - Usa tokens CSRF para formularios
+ *
+ * Variables Twig utilizadas:
+ * - app.user: objeto User con datos del usuario actual
+ *   - username, email, profileImage, isSubscribedToNewsletter
+ */
+#}
 {% extends 'base.html.twig' %}
 
 {% block title %}Mi Perfil - GameNews{% endblock %}

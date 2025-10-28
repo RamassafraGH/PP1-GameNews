@@ -16,6 +16,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ReportController extends AbstractController
 {
+    /**
+     * ReportController
+     *
+     * Gestiona la creación de denuncias sobre comentarios. Protegida con
+     * `IsGranted('ROLE_USER')`, recibe un formulario (`ReportFormType`) y
+     * persiste una entidad `Report` con estado 'pending'.
+     *
+     * Ideal para explicar cómo se integran formularios, entidades y la
+     * navegación de vuelta a la noticia (`redirectToRoute`).
+     */
     #[Route('/comentario/{id}', name: 'app_report_comment')]
     public function reportComment(
         int $id,

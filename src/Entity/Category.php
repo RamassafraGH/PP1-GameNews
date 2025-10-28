@@ -14,6 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['name'], message: 'Esta categoría ya existe')]
 class Category
 {
+    /**
+     * Entity Category
+     *
+     * Representa una categoría de noticias. Campos:
+     * - name, description, slug, createdAt
+     * Relación ManyToMany con `News`.
+     *
+     * En la demo: mostrar cómo las categorías se usan para filtrar listados
+     * y cómo se representan en formularios (`EntityType`).
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

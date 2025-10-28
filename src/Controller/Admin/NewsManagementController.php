@@ -39,6 +39,30 @@ class NewsManagementController extends AbstractController
         ]);
     }
 
+    /**
+     * Crea una nueva noticia en el sistema
+     *
+     * Este método maneja el proceso completo de creación de noticias:
+     * 1. Generación de slug único para URL amigable
+     * 2. Procesamiento de imagen destacada
+     * 3. Asignación de autor y fecha de publicación
+     *
+     * Procesamiento de archivos:
+     * 1. Validación de imagen subida
+     * 2. Generación de nombre seguro
+     * 3. Movimiento al directorio configurado
+     *
+     * Reglas de negocio:
+     * - Solo editores pueden crear noticias
+     * - El slug debe ser único
+     * - Fecha de publicación automática si status = published
+     * - Autor asignado automáticamente
+     *
+     * @param Request $request Para procesar formulario
+     * @param EntityManagerInterface $entityManager Para persistir la noticia
+     * @param SluggerInterface $slugger Para generar URLs amigables
+     * @throws FileException Si hay error al subir imagen
+     */
     #[Route('/nueva', name: 'app_admin_news_new')]
     public function new(
         Request $request,
@@ -91,6 +115,32 @@ class NewsManagementController extends AbstractController
         ]);
     }
 
+    /**
+     * Edita una noticia existente
+     *
+     * Este método gestiona la actualización de noticias con:
+     * 1. Gestión de imágenes (mantener existente o subir nueva)
+     * 2. Control de fechas (actualización y publicación)
+     * 3. Manejo de estado de publicación
+     *
+     * Características principales:
+     * - ParamConverter inyecta la noticia automáticamente
+     * - Actualización selectiva de imagen
+     * - Control automático de fechas
+     * - Manejo de estado de publicación
+     *
+     * Reglas de negocio:
+     * - Solo editores pueden modificar noticias
+     * - Actualización automática de updatedAt
+     * - PublishedAt se establece al publicar por primera vez
+     * - Mantiene imagen anterior si no se sube nueva
+     *
+     * @param News $news La noticia a editar (inyectada por ParamConverter)
+     * @param Request $request Para procesar el formulario
+     * @param EntityManagerInterface $entityManager Para persistir cambios
+     * @param SluggerInterface $slugger Para procesar nombres de archivo
+     * @throws FileException Si hay error al subir imagen
+     */
     #[Route('/{id}/editar', name: 'app_admin_news_edit')]
     public function edit(
         News $news,

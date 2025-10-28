@@ -18,6 +18,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['username'], message: 'Este nombre de usuario ya existe')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * Entity User
+     *
+     * Representa a un usuario del sistema. Campos clave:
+     * - email, username, password, roles
+     * - profileImage, createdAt, lastLoginAt
+     * - estados: isActive, isSubscribedToNewsletter, failedLoginAttempts, blockedUntil
+     *
+     * Relaciones:
+     * - comments (OneToMany)
+     * - newsRatings (OneToMany)
+     * - commentVotes (OneToMany)
+     * - newsCreated (OneToMany)
+     * - reports (OneToMany)
+     *
+     * En la demo: explicar cómo Symfony usa `UserInterface` para autenticación
+     * y cómo los roles determinan permisos (ROLE_USER, ROLE_EDITOR, ROLE_ADMIN).
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

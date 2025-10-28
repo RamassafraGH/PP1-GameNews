@@ -14,6 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['name'], message: 'Esta etiqueta ya existe')]
 class Tag
 {
+    /**
+     * Entity Tag
+     *
+     * Representa una etiqueta (tag) para noticias. Campos:
+     * - name, description, synonyms, slug, createdAt
+     * Relación ManyToMany con `News`.
+     *
+     * En la demo: explicar la diferencia entre categorías (obligatorias)
+     * y etiquetas (opcionales), y cómo se usan para filtrar/organizar.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

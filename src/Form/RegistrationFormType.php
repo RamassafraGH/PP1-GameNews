@@ -18,6 +18,16 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
+    /**
+     * RegistrationFormType
+     *
+     * Define los campos necesarios para registrar un usuario. No mapea la
+     * contraseña en claro (se usa `plainPassword` como campo no mapeado) y
+     * contiene constraints para validación (longitud, patrón, términos).
+     *
+     * En la demo: muestra cómo Symfony Forms separa la validación y el
+     * mapeo hacia la entidad `User`.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

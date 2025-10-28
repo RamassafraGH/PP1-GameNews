@@ -13,6 +13,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportFormType extends AbstractType
 {
+    /**
+     * ReportFormType
+     *
+     * Formulario para denunciar un comentario. Incluye selección de motivo y
+     * una descripción. Usado por `ReportController::reportComment()`.
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

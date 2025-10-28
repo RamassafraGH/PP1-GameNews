@@ -13,6 +13,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
+    /**
+     * RegistrationController
+     *
+     * Controla el flujo de registro de usuarios (CU01). Muestra el formulario,
+     * valida los datos y persiste la entidad `User` con la contraseña hasheada.
+     *
+     * En la demo: mostrar `RegistrationFormType`, el hashing de contraseña y la
+     * redirección al login una vez creado el usuario.
+     */
     #[Route('/registro', name: 'app_register')]
     public function register(
         Request $request,

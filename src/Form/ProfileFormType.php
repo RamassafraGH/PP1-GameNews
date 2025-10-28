@@ -13,6 +13,15 @@ use Symfony\Component\Validator\Constraints\Image;
 
 class ProfileFormType extends AbstractType
 {
+    /**
+     * ProfileFormType
+     *
+     * Define los campos que el usuario puede editar en su perfil: username y
+     * subida de imagen de perfil (campo no mapeado `profileImageFile`).
+     *
+     * En la demo: explicar el uso de `mapped => false` y cómo se procesa la
+     * subida en el controlador (`move()` y uso de `SluggerInterface`).
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
