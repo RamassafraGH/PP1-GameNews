@@ -133,7 +133,7 @@
                 <div class="card h-100">
                     <a href="{{ path('app_news_show', {slug: news.slug}) }}" class="text-decoration-none">
                         {% if news.featuredImage %}
-                            <img src="{{ asset('uploads/news/predefined/' ~ news.featuredImage) }}" 
+                            <img src="{{ asset( news.featuredImage) }}" 
                                  class="card-img-top news-card-img" 
                                  alt="{{ news.title }}"
                                  style="cursor: pointer;">

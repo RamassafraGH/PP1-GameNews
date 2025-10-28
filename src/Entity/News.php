@@ -156,9 +156,10 @@ class News
         return $this->featuredImage;
     }
 
-    public function setFeaturedImage(?string $featuredImage): static
+
+    public function setPredefinedImage(string $imageName): static
     {
-        $this->featuredImage = $featuredImage;
+        $this->featuredImage = '/uploads/news/predefined/' . $imageName;
         return $this;
     }
 

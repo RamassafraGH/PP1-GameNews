@@ -90,7 +90,7 @@ class NewsManagementController extends AbstractController
                         $this->getParameter('news_images_directory'),
                         $newFilename
                     );
-                    $news->setFeaturedImage($newFilename);
+                    $news->setPredefinedImage($newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Error al subir la imagen');
                 }

@@ -42,7 +42,7 @@
 
                 <div class="card mb-4">
                     {% if news.featuredImage %}
-                        <img src="{{ asset('uploads/news/predefined/' ~ news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
+                        <img src="{{ asset( news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
                     {% endif %}
                     
                     <div class="card-body">
@@ -140,55 +140,70 @@
 </div>
 
 <hr>
+<div class="comments-section">
+    <h5 class="mb-3">Comentarios</h5>
 
-                        {% for comment in comments %}
-                <div class="comment mb-4 p-3" style="background-color: #1a1a2e; border-radius: 8px;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <strong>{{ comment.author.username }}</strong>
-                            <small class="text-muted ms-2">{{ comment.createdAt|date('d/m/Y H:i') }}</small>
-                        </div>
-                        {% if app.user and app.user != comment.author %}
-                            <a href="{{ path('app_report_comment', {id: comment.id}) }}" class="btn btn-sm btn-outline-warning" title="Denunciar comentario">
-                                <i class="bi bi-flag"></i>
-                            </a>
-                        {% endif %}
-                    </div>
-                    
-                    <p class="mb-2">{{ comment.content }}</p>
-                    
-                    <div class="d-flex gap-3">
-                        {% if app.user %}
-                            <button class="btn btn-sm btn-outline-success vote-btn" 
-                                    data-comment-id="{{ comment.id }}" 
-                                    data-type="like"
-                                    {% if userVotes[comment.id]|default('') == 'like' %}disabled{% endif %}>
-                                <i class="bi bi-hand-thumbs-up"></i> 
-                                <span class="likes-count">{{ comment.likesCount }}</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger vote-btn" 
-                                    data-comment-id="{{ comment.id }}" 
-                                    data-type="dislike"
-                                    {% if userVotes[comment.id]|default('') == 'dislike' %}disabled{% endif %}>
-                                <i class="bi bi-hand-thumbs-down"></i> 
-                                <span class="dislikes-count">{{ comment.dislikesCount }}</span>
-                            </button>
-                        {% else %}
-                            <small class="text-muted">
-                                <i class="bi bi-hand-thumbs-up"></i> {{ comment.likesCount }}
-                                <i class="bi bi-hand-thumbs-down ms-2"></i> {{ comment.dislikesCount }}
-                            </small>
-                        {% endif %}
-                    </div>
-                </div>
-            {% else %}
-                <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
-            {% endfor %}
-                    </div>
-                </div>
-            </article>
+{% if app.user %}
+    <div class="mb-4">
+        {{ form_start(commentForm) }}
+        {{ form_widget(commentForm, {'attr': {'class': 'form-control'}}) }}
+        <button type="submit" class="btn btn-primary mt-2">Publicar comentario</button>
+        {{ form_end(commentForm) }}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <a href="{{ path('app_login') }}" class="text-decoration-none">Inicia sesión</a> para comentar en esta noticia.
+    </div>
+{% endif %}
 
-            {% endblock %}
+                    {% for comment in comments %}
+            <div class="comment mb-4 p-3" style="background-color: #1a1a2e; border-radius: 8px;">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <strong>{{ comment.author.username }}</strong>
+                        <small class="text-muted ms-2">{{ comment.createdAt|date('d/m/Y H:i') }}</small>
+                    </div>
+                    {% if app.user and app.user != comment.author %}
+                        <a href="{{ path('app_report_comment', {id: comment.id}) }}" class="btn btn-sm btn-outline-warning" title="Denunciar comentario">
+                            <i class="bi bi-flag"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <p class="mb-2">{{ comment.content }}</p>
+                
+                <div class="d-flex gap-3">
+                    {% if app.user %}
+                        <button class="btn btn-sm btn-outline-success vote-btn" 
+                                data-comment-id="{{ comment.id }}" 
+                                data-type="like"
+                                {% if userVotes[comment.id]|default('') == 'like' %}disabled{% endif %}>
+                            <i class="bi bi-hand-thumbs-up"></i> 
+                            <span class="likes-count">{{ comment.likesCount }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger vote-btn" 
+                                data-comment-id="{{ comment.id }}" 
+                                data-type="dislike"
+                                {% if userVotes[comment.id]|default('') == 'dislike' %}disabled{% endif %}>
+                            <i class="bi bi-hand-thumbs-down"></i> 
+                            <span class="dislikes-count">{{ comment.dislikesCount }}</span>
+                        </button>
+                    {% else %}
+                        <small class="text-muted">
+                            <i class="bi bi-hand-thumbs-up"></i> {{ comment.likesCount }}
+                            <i class="bi bi-hand-thumbs-down ms-2"></i> {{ comment.dislikesCount }}
+                        </small>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+        {% endfor %}
+                </div>
+            </div>
+        </article>
+
+        {% endblock %}
 
             {% block javascripts %}
 <script>
