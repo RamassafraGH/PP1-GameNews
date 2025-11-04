@@ -16,18 +16,27 @@ class Comment
      * Entity Comment
      *
      * Representa un comentario en una noticia. Campos importantes:
-     * - content, createdAt, updatedAt
-     * - isApproved (control de moderación)
-     * - likesCount, dislikesCount
+     * - content: Contenido del comentario (texto)
+     * - createdAt: Fecha de creación (inmutable)
+     * - updatedAt: Fecha de última actualización (nullable)
+     * - isApproved: Estado de aprobación para moderación
+     * - likesCount: Contador de votos positivos
+     * - dislikesCount: Contador de votos negativos
      *
      * Relaciones:
-     * - author (ManyToOne -> User)
-     * - news (ManyToOne -> News)
-     * - votes (OneToMany -> CommentVote)
-     * - reports (OneToMany -> Report)
+     * - author (ManyToOne -> User): Usuario que creó el comentario
+     * - news (ManyToOne -> News): Noticia a la que pertenece el comentario
+     * - votes (OneToMany -> CommentVote): Votos recibidos, con cascade remove
+     * - reports (OneToMany -> Report): Denuncias del comentario, con cascade remove
      *
-     * En la demo: explicar cómo se persisten comentarios y cómo los votos
-     * actualizan los contadores (likes/dislikes) mediante `CommentVote`.
+     * Comportamiento cascade:
+     * Al eliminar un comentario, se eliminan automáticamente:
+     * - Todos los votos asociados (CommentVote)
+     * - Todos los reportes asociados (Report)
+     * 
+     * Esto evita violaciones de restricciones de clave foránea y mantiene
+     * la integridad referencial de la base de datos.
+     *
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -61,18 +70,47 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?News $news = null;
 
-    #[ORM\OneToMany(mappedBy: 'comment', targetEntity: CommentVote::class, orphanRemoval: true)]
+    /**
+     * Colección de votos asociados al comentario.
+     * 
+     * Configuración:
+     * - orphanRemoval: true -> Elimina votos huérfanos automáticamente
+     * - cascade: ['remove'] -> Al eliminar el comentario, elimina todos los votos
+     * 
+     * Esta configuración evita el error ForeignKeyConstraintViolationException
+     * al eliminar comentarios que tienen votos asociados.
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'comment', 
+        targetEntity: CommentVote::class, 
+        orphanRemoval: true,
+        cascade: ['remove']
+    )]
     private Collection $votes;
 
-    #[ORM\OneToMany(mappedBy: 'comment', targetEntity: Report::class)]
+    /**
+     * Colección de reportes/denuncias asociados al comentario.
+     * 
+     * Configuración:
+     * - cascade: ['remove'] -> Al eliminar el comentario, elimina todos los reportes
+     * 
+     * Esto garantiza que cuando se elimina un comentario reportado,
+     * todos los reportes asociados también se eliminan automáticamente,
+     * manteniendo la consistencia de la base de datos.
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'comment', 
+        targetEntity: Report::class,
+        cascade: ['remove']
+    )]
     private Collection $reports;
 
     public function __construct()
     {
-    $this->votes = new ArrayCollection();
-    $this->reports = new ArrayCollection();
-    $this->createdAt = new \DateTimeImmutable();
-    $this->isApproved = true;
+        $this->votes = new ArrayCollection();
+        $this->reports = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->isApproved = true;
     }
 
     public function getId(): ?int

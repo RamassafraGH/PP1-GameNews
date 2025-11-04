@@ -1,22 +1,37 @@
+{# ==============================
+     review.html.twig
+
+   Página del panel de moderación para revisar denuncias de comentarios en GameNews.
+   Muestra el detalle del comentario denunciado, el motivo, acciones de moderación y el estado.
+   ============================== #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Revisar Denuncia - GameNews{% endblock %}
 
 {% block body %}
 <div class="mb-3">
+    {# Botón para volver al listado de denuncias #}
     <a href="{{ path('app_admin_moderation_index') }}" class="btn btn-sm btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
 </div>
 
 <div class="row">
+    {# ============================
+       SECCIÓN IZQUIERDA (Principal)
+       Muestra el comentario denunciado y las acciones de moderación
+       ============================ #}
     <div class="col-lg-8 mb-4">
+        
+        {# --- Comentario Denunciado --- #}
         <div class="card mb-4">
             <div class="card-body">
                 <h3 class="card-title"><i class="bi bi-chat-dots"></i> Comentario Denunciado</h3>
                 <hr>
                 
                 {% if report.comment %}
+                    {# Información del comentario y su autor #}
                     <div class="alert alert-secondary">
                         <div class="row">
                             <div class="col-md-6 mb-2 mb-md-0">
@@ -29,45 +44,113 @@
                                 <strong>Noticia:</strong> 
                                 <a href="{{ path('app_news_show', {slug: report.comment.news.slug}) }}" target="_blank" class="text-break">
                                     {{ report.comment.news.title }}
+                                    <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-3" style="background-color: #1a1a2e; border-radius: 8px;">
+                    {# Contenido del comentario denunciado #}
+                    <div class="p-3 mb-3" style="background-color: #1a1a2e; border-radius: 8px; border-left: 4px solid #f59e0b;">
                         <p class="mb-0 text-break">{{ report.comment.content }}</p>
                     </div>
+
+                    {# Información adicional sobre el comentario #}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Estadísticas del comentario:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><i class="bi bi-hand-thumbs-up"></i> Me gusta: {{ report.comment.likesCount }}</li>
+                            <li><i class="bi bi-hand-thumbs-down"></i> No me gusta: {{ report.comment.dislikesCount }}</li>
+                            <li><i class="bi bi-flag"></i> Total de denuncias: {{ report.comment.reports|length }}</li>
+                        </ul>
+                    </div>
                 {% else %}
+                    {# Caso en el que el comentario ya fue eliminado #}
                     <div class="alert alert-warning">
-                        El comentario ya ha sido eliminado.
+                        <i class="bi bi-exclamation-triangle"></i> El comentario ya ha sido eliminado.
                     </div>
                 {% endif %}
             </div>
         </div>
 
+        {# --- Acciones de Moderación --- #}
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title"><i class="bi bi-exclamation-triangle"></i> Acciones de Moderación</h3>
+                <h3 class="card-title"><i class="bi bi-shield-exclamation"></i> Acciones de Moderación</h3>
                 <hr>
                 
-                <form method="post">
-                    <div class="d-grid gap-2 d-md-flex">
-                        {% if report.comment %}
-                            <button type="submit" name="action" value="delete_comment" class="btn btn-danger flex-fill" onclick="return confirm('¿Estás seguro de eliminar este comentario?')">
-                                <i class="bi bi-trash"></i> Eliminar Comentario
-                            </button>
-                        {% endif %}
-                        
-                        <button type="submit" name="action" value="dismiss" class="btn btn-secondary flex-fill">
-                            <i class="bi bi-x-circle"></i> Descartar Denuncia
-                        </button>
+                {% if report.status == 'pending' %}
+                    {# Denuncia pendiente de revisión #}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
                     </div>
-                </form>
+
+                    <form method="post">
+                        <div class="row g-3">
+                            {# Acción: Eliminar comentario #}
+                            {% if report.comment %}
+                                <div class="col-md-6">
+                                    <button type="submit" 
+                                            name="action" 
+                                            value="delete_comment" 
+                                            class="btn btn-danger w-100 p-3" 
+                                            onclick="return confirm('⚠️ ¿Estás seguro de ELIMINAR este comentario?\n\nSe eliminarán también:\n- Todos los votos del comentario\n- Todas las denuncias asociadas\n\nEsta acción NO se puede deshacer.')">
+                                        <i class="bi bi-trash" style="font-size: 1.5rem;"></i>
+                                        <h6 class="mt-2 mb-0">Eliminar Comentario</h6>
+                                        <small>Elimina el comentario, sus votos y todas sus denuncias</small>
+                                    </button>
+                                </div>
+                            {% endif %}
+                            
+                            {# Acción: Descartar denuncia #}
+                            <div class="col-md-6">
+                                <button type="submit" 
+                                        name="action" 
+                                        value="dismiss" 
+                                        class="btn btn-secondary w-100 p-3"
+                                        onclick="return confirm('¿Estás seguro de DESCARTAR esta denuncia?\n\nEl comentario permanecerá visible.')">
+                                    <i class="bi bi-x-circle" style="font-size: 1.5rem;"></i>
+                                    <h6 class="mt-2 mb-0">Descartar Denuncia</h6>
+                                    <small>La denuncia se marca como descartada, el comentario permanece</small>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    {# Denuncia ya procesada (resuelta o descartada) #}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Esta denuncia ya fue procesada: 
+                        <strong>
+                            {% if report.status == 'resolved' %}
+                                Resuelta (comentario eliminado)
+                            {% else %}
+                                Descartada
+                            {% endif %}
+                        </strong>
+                        el {{ report.resolvedAt|date('d/m/Y H:i') }}
+                    </div>
+
+                    {# Acción adicional: eliminar el reporte del sistema #}
+                    <form method="post" action="{{ path('app_admin_moderation_delete_report', {id: report.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_report' ~ report.id) }}">
+                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Eliminar este reporte del sistema?')">
+                            <i class="bi bi-trash"></i> Eliminar Reporte del Sistema
+                        </button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
 
+    {# ============================
+       SECCIÓN DERECHA (Detalles)
+       Muestra la información de la denuncia y sus metadatos
+       ============================ #}
     <div class="col-lg-4">
+        {# --- Información de la denuncia --- #}
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-info-circle"></i> Información de la Denuncia</h5>
@@ -80,22 +163,29 @@
                 
                 <div class="mb-3">
                     <strong>Denunciante:</strong><br>
-                    <span class="text-break">{{ report.reporter.username }}</span>
+                    <span class="text-break">{{ report.reporter.username }}</span><br>
+                    <small class="text-muted">{{ report.reporter.email }}</small>
                 </div>
                 
                 <div class="mb-3">
-                    <strong>Email:</strong><br>
-                    <span class="text-break small">{{ report.reporter.email }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <strong>Fecha:</strong><br>
+                    <strong>Fecha de denuncia:</strong><br>
                     {{ report.createdAt|date('d/m/Y H:i') }}
+                </div>
+
+                <div class="mb-3">
+                    <strong>Estado:</strong><br>
+                    {% if report.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elseif report.status == 'resolved' %}
+                        <span class="badge bg-success">Resuelto</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Descartado</span>
+                    {% endif %}
                 </div>
                 
                 <div>
                     <strong>Motivo:</strong><br>
-                    <span class="badge bg-warning text-dark mt-2">
+                    <span class="badge bg-danger mt-2">
                         {% if report.reason == 'inappropriate_content' %}
                             Contenido inapropiado
                         {% elseif report.reason == 'offensive_language' %}
@@ -112,13 +202,28 @@
             </div>
         </div>
 
+        {# --- Descripción detallada del reporte --- #}
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-file-text"></i> Descripción</h5>
+                <h5 class="card-title"><i class="bi bi-file-text"></i> Descripción Detallada</h5>
                 <hr>
                 <p class="text-break">{{ report.description }}</p>
             </div>
         </div>
+
+        {# --- Bloque adicional si hay múltiples denuncias --- #}
+        {% if report.comment and report.comment.reports|length > 1 %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Múltiples Denuncias
+                    </h5>
+                    <hr>
+                    <p>Este comentario tiene <strong>{{ report.comment.reports|length }}</strong> denuncias en total.</p>
+                    <small class="text-muted">Al eliminar el comentario, se eliminarán todas las denuncias asociadas.</small>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

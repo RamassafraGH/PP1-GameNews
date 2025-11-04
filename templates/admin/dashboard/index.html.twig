@@ -37,9 +37,10 @@
     {% if isAdmin %}Administración{% else %}Editor{% endif %}
 </h1>
 
-{# SECCIÓN: GESTIÓN DE CONTENIDO (Para Editores y Admins) #}
 <h4 class="mb-3"><i class="bi bi-grid"></i> Gestión de Contenido</h4>
 <div class="row g-4 mb-4">
+
+    {# Noticias visible para ambos #}
     <div class="col-md-3">
         <a href="{{ path('app_admin_news_index') }}" class="card text-decoration-none h-100">
             <div class="card-body text-center">
@@ -50,36 +51,40 @@
         </a>
     </div>
 
-    <div class="col-md-3">
-        <a href="{{ path('app_admin_category_index') }}" class="card text-decoration-none h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-folder" style="font-size: 3rem; color: #10b981;"></i>
-                <h5 class="mt-3 mb-2">Categorías</h5>
-                <p class="text-muted small mb-0">Administrar categorías</p>
-            </div>
-        </a>
-    </div>
+    {# Solo para editores #}
+    {% if not isAdmin %}
+        <div class="col-md-3">
+            <a href="{{ path('app_admin_category_index') }}" class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-folder" style="font-size: 3rem; color: #10b981;"></i>
+                    <h5 class="mt-3 mb-2">Categorías</h5>
+                    <p class="text-muted small mb-0">Administrar categorías</p>
+                </div>
+            </a>
+        </div>
 
-    <div class="col-md-3">
-        <a href="{{ path('app_admin_tag_index') }}" class="card text-decoration-none h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-tags" style="font-size: 3rem; color: #3b82f6;"></i>
-                <h5 class="mt-3 mb-2">Etiquetas</h5>
-                <p class="text-muted small mb-0">Administrar etiquetas</p>
-            </div>
-        </a>
-    </div>
+        <div class="col-md-3">
+            <a href="{{ path('app_admin_tag_index') }}" class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-tags" style="font-size: 3rem; color: #3b82f6;"></i>
+                    <h5 class="mt-3 mb-2">Etiquetas</h5>
+                    <p class="text-muted small mb-0">Administrar etiquetas</p>
+                </div>
+            </a>
+        </div>
 
-    <div class="col-md-3">
-        <a href="{{ path('app_admin_newsletter_subscribers') }}" class="card text-decoration-none h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-envelope" style="font-size: 3rem; color: #8b5cf6;"></i>
-                <h5 class="mt-3 mb-2">Boletín</h5>
-                <p class="text-muted small mb-0">{{ subscribersCount }} suscriptores</p>
-            </div>
-        </a>
-    </div>
+        <div class="col-md-3">
+            <a href="{{ path('app_admin_newsletter_subscribers') }}" class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-envelope" style="font-size: 3rem; color: #8b5cf6;"></i>
+                    <h5 class="mt-3 mb-2">Boletín</h5>
+                    <p class="text-muted small mb-0">{{ subscribersCount }} suscriptores</p>
+                </div>
+            </a>
+        </div>
+    {% endif %}
 </div>
+
 
 {# SECCIÓN SOLO PARA ADMINISTRADORES #}
 {% if isAdmin %}

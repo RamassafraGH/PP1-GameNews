@@ -23,12 +23,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * moderación de comentarios y reportes de usuarios:
  * - Listado de reportes pendientes
  * - Revisión de reportes individuales
- * - Acciones de moderación (eliminar/descartar)
+ * - Acciones de moderación (eliminar comentario/eliminar reporte)
  *
  * Seguridad:
  * - Requiere ROLE_ADMIN para todas las acciones
  * - Acceso restringido a área administrativa
  * - Manejo seguro de eliminación de contenido
+ * 
+ * Gestión de integridad referencial:
+ * - Utiliza cascade remove en la entidad Comment para eliminar automáticamente
+ *   votos (CommentVote) y reportes (Report) asociados
+ * - Los reportes descartados se eliminan completamente de la base de datos
  */
 class ModerationController extends AbstractController
 {
@@ -41,12 +46,15 @@ class ModerationController extends AbstractController
      *
      * Características:
      * - Paginación de resultados (20 por página)
-     * - Ordenamiento por fecha más reciente
+     * - Ordenamiento por fecha más reciente (los más nuevos primero)
      * - Vista rápida del estado de cada reporte
+     * - Acceso directo a la acción de revisión
      *
-     * @param Request $request Para manejar la paginación
-     * @param ReportRepository $reportRepository Acceso a reportes
-     * @param PaginatorInterface $paginator Para paginar resultados
+     * @param Request $request Para manejar la paginación mediante query params
+     * @param ReportRepository $reportRepository Acceso al repositorio de reportes
+     * @param PaginatorInterface $paginator Servicio de paginación de KnpPaginator
+     * 
+     * @return Response Vista con el listado paginado de reportes
      */
     #[Route('/', name: 'app_admin_moderation_index')]
     public function index(
@@ -73,22 +81,38 @@ class ModerationController extends AbstractController
      *
      * Este método permite a los administradores revisar reportes
      * individuales y tomar dos posibles acciones:
-     * 1. Eliminar el comentario reportado
-     * 2. Descartar el reporte
+     * 
+     * 1. **Eliminar el comentario reportado** (delete_comment):
+     *    - Elimina el comentario de la base de datos
+     *    - Gracias a cascade remove, también elimina automáticamente:
+     *      · Todos los votos (CommentVote) asociados al comentario
+     *      · Todos los reportes (Report) asociados al comentario
+     *    - Evita violaciones de restricciones de clave foránea
+     *    - Mantiene la integridad referencial de la base de datos
+     * 
+     * 2. **Descartar el reporte** (dismiss):
+     *    - Elimina el reporte completamente de la base de datos
+     *    - No modifica el comentario reportado
+     *    - Útil cuando el reporte es infundado o incorrecto
+     *    - Mantiene la base de datos limpia sin reportes descartados
      *
      * Flujo de trabajo:
-     * 1. Muestra detalles del reporte y contenido reportado
-     * 2. Procesa la acción seleccionada por el administrador
-     * 3. Actualiza el estado del reporte
-     * 4. Registra la fecha de resolución
+     * 1. GET: Muestra el formulario con detalles del reporte y el comentario
+     * 2. POST: Procesa la acción seleccionada por el administrador
+     * 3. Ejecuta la eliminación correspondiente
+     * 4. Muestra mensaje de confirmación mediante flash
+     * 5. Redirige al listado de reportes
      *
-     * Acciones disponibles:
-     * - delete_comment: Elimina el comentario y marca reporte como resuelto
-     * - dismiss: Marca el reporte como descartado
+     * Ventajas del enfoque cascade:
+     * - Código más limpio y mantenible
+     * - Sin necesidad de eliminar manualmente entidades relacionadas
+     * - La lógica de eliminación está en la entidad, no en el controlador
      *
-     * @param Report $report El reporte a revisar (inyectado por ParamConverter)
-     * @param Request $request Para procesar la acción seleccionada
-     * @param EntityManagerInterface $entityManager Para persistir cambios
+     * @param Report $report El reporte a revisar (inyectado automáticamente por Symfony)
+     * @param Request $request Para procesar el método HTTP y la acción seleccionada
+     * @param EntityManagerInterface $entityManager Para persistir los cambios en la BD
+     * 
+     * @return Response Vista de revisión (GET) o redirección al índice (POST)
      */
     #[Route('/{id}/revisar', name: 'app_admin_moderation_review')]
     public function review(
@@ -100,21 +124,17 @@ class ModerationController extends AbstractController
             $action = $request->request->get('action');
 
             if ($action === 'delete_comment') {
-                // Eliminar comentario
+                // Eliminar comentario (cascade eliminará votos y reportes automáticamente)
                 $comment = $report->getComment();
                 if ($comment) {
                     $entityManager->remove($comment);
+                    $this->addFlash('success', 'Comentario eliminado correctamente');
                 }
-                $report->setStatus('resolved');
-                $report->setResolvedAt(new \DateTime());
                 
-                $this->addFlash('success', 'Comentario eliminado correctamente');
             } elseif ($action === 'dismiss') {
-                // Descartar denuncia
-                $report->setStatus('dismissed');
-                $report->setResolvedAt(new \DateTime());
-                
-                $this->addFlash('info', 'Denuncia descartada');
+                // Eliminar el reporte de la base de datos
+                $entityManager->remove($report);
+                $this->addFlash('info', 'Denuncia eliminada correctamente');
             }
 
             $entityManager->flush();

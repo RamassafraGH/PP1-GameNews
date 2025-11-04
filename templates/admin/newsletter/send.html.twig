@@ -38,7 +38,7 @@
                                             </div>
 
                                             {% if news.featuredImage %}
-                                                <img src="{{ asset('uploads/news/predefined/' ~ news.featuredImage) }}" class="card-img-top mb-3" style="max-height: 150px; object-fit: cover;" alt="{{ news.title }}">
+                                                    <img src="{{ asset( news.featuredImage) }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ news.title }}">
                                             {% endif %}
 
                                             <h6 class="card-title">{{ news.title }}</h6>

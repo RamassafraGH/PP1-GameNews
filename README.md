@@ -75,6 +75,8 @@ cd PP1-GameNews
 2. **Instalar dependencias**
 ```bash
 composer install
+npm install
+npm run build
 ```
 
 3. **Configurar la base de datos**
@@ -102,15 +104,16 @@ mkdir -p public/uploads/news
 mkdir -p public/uploads/news/predefined
 ```
 
-7. **Iniciar el servidor**
+7. **Iniciar el servidor y acceder**
+
+- Copiar el archivo conf dentro de docs/serverTest y colocarlo en laragon\etc\apache2\sites-enabled
+- URL Server: http://pp1-gamenews.test/
+
 ```bash
-symfony server:start
-# O con PHP nativo
+# Opcion PHP nativo
 php -S localhost:8000 -t public
 ```
-
-8. **Acceder a la aplicación**
-- URL: `http://localhost:8000`
+- URL PHP: http://localhost:8000
 
 ## Usuarios de Prueba
 
