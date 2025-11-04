@@ -157,12 +157,14 @@ PP1-GameNews/
 - **CU05:** Explorar noticias
 - **CU06:** Buscar contenido
 - **CU07:** Comentar contenido
+- **CU08:** Denunciar
 - **CU09:** Votar comentario
 - **CU10:** Votar noticia
 - **CU11:** Suscribirse al boletín
 - **CU12:** Gestión de noticias
 - **CU13:** Editar categorías
 - **CU14:** Editar etiquetas
+- **CU16:** Moderar comentarios
 - **CU20:** Ver noticia
 
 # Sistema de Roles
