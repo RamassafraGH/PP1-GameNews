@@ -12,8 +12,7 @@
 - Template: templates/registration/register.html.twig
 
 *Flujo y código:*
-
-php
+```php
 // src/Controller/RegistrationController.php
 #[Route('/register', name: 'app_register')]
 public function register(Request $request): Response
@@ -45,7 +44,7 @@ public function register(Request $request): Response
         'registrationForm' => $form,
     ]);
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $this->createForm(RegistrationFormType::class, $user) → Crea instancia del formulario vinculada a la entidad User.
@@ -58,7 +57,7 @@ public function register(Request $request): Response
 8. $this->redirectToRoute('app_login') → Redirecciona a página de login.
 
 *Plantilla asociada:*
-twig
+```twig
 {# templates/registration/register.html.twig #}
 <form method="post">
     {{ form_start(registrationForm) }}
@@ -68,7 +67,7 @@ twig
         <button type="submit">Registrarse</button>
     {{ form_end(registrationForm) }}
 </form>
-
+```
 
 ---
 
@@ -83,7 +82,7 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/SecurityController.php
 #[Route('/login', name: 'app_login')]
 public function login(AuthenticationUtils $authenticationUtils): Response
@@ -105,7 +104,7 @@ public function logout(): void
 {
     // Symfony maneja automáticamente la invalidación de sesión
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $authenticationUtils->getLastAuthenticationError() → Recupera el último error de autenticación (si las credenciales fallaron).
@@ -114,7 +113,7 @@ public function logout(): void
 4. Symfony Security maneja internamente: verificación de credenciales, creación de sesión, tokens de seguridad (UserProvider en UserRepository).
 
 *Plantilla asociada:*
-twig
+```twig
 {# templates/security/login.html.twig #}
 {% if error %}
     <div class="alert alert-danger">
@@ -131,7 +130,7 @@ twig
     
     <button type="submit">Ingresar</button>
 </form>
-
+```
 
 ---
 
@@ -145,7 +144,7 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/ProfileController.php
 #[Route('/profile/edit', name: 'app_profile_edit')]
 #[IsGranted('ROLE_USER')]
@@ -189,7 +188,7 @@ public function index(): Response
         'user' => $user,
     ]);
 }
-
+```
 
 *Explicación de comandos clave:*
 1. #[IsGranted('ROLE_USER')] → Anotación que verifica permisos; solo usuarios autenticados acceden.
@@ -226,7 +225,7 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/NewsController.php
 #[Route('/news', name: 'app_news_index')]
 public function index(Request $request, PaginatorInterface $paginator): Response
@@ -279,7 +278,7 @@ public function findPublishedByCategory(?string $categorySlug = null, int $limit
     
     return $query->getQuery()->getResult();
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $request->query->getInt('page', 1) → Obtiene parámetro ?page= de URL (por defecto 1).
@@ -323,47 +322,81 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/NewsController.php
-#[Route('/search', name: 'app_search')]
-public function search(Request $request): Response
+#[Route('/', name: 'app_news_index')]
+    public function index(Request $request): Response
 {
     // CU06: Buscar contenido
     $searchTerm = $request->query->get('q', '');
+    $category = $request->query->get('category');
+    $tag = $request->query->get('tag');
+    $from = $request->query->get('from');
+    $to = $request->query->get('to');
+
     $results = [];
-    
-    if (strlen($searchTerm) >= 3) {
-        // Buscar solo si hay al menos 3 caracteres
-        $results = $this->newsRepository->searchByTerm($searchTerm);
+
+    // Buscar si hay término válido o filtros activos
+    if (strlen($searchTerm) >= 3 || $category || $tag || $from || $to) {
+        $results = $this->newsRepository->searchByFilters($searchTerm, $category, $tag, $from, $to);
     }
-    
+
     return $this->render('news/search_results.html.twig', [
         'searchTerm' => $searchTerm,
-        'results' => $results,
-    ]);
-}
+        'category' => $category,
+        'tag' => $tag,
+        'from' => $from,
+        'to' => $to
 
 // Método en NewsRepository
 // src/Repository/NewsRepository.php
-public function searchByTerm(string $term): array
-{
-    return $this->createQueryBuilder('n')
+public function searchNews(
+    ?string $query = null,
+    ?Category $category = null,
+    ?Tag $tag = null,
+    ?\DateTime $dateFrom = null,
+    ?\DateTime $dateTo = null
+): array {
+    $qb = $this->createQueryBuilder('n')
         ->leftJoin('n.tags', 't')
         ->leftJoin('n.categories', 'c')
         ->where('n.status = :status')
-        ->andWhere(
+        ->setParameter('status', 'published');
+
+    if ($term && strlen($term) >= 3) {
+        $qb->andWhere(
             'n.title LIKE :term 
             OR n.body LIKE :term 
             OR t.name LIKE :term 
             OR c.name LIKE :term'
-        )
-        ->setParameter('status', 'published')
-        ->setParameter('term', '%'.$term.'%')
-        ->orderBy('n.publishedAt', 'DESC')
-        ->getQuery()
-        ->getResult();
-}
+        )->setParameter('term', '%'.$term.'%');
+    }
 
+    if ($category) {
+        $qb->andWhere('c.name = :category')
+           ->setParameter('category', $category);
+    }
+
+    if ($tag) {
+        $qb->andWhere('t.name = :tag')
+           ->setParameter('tag', $tag);
+    }
+
+    if ($from) {
+        $qb->andWhere('n.publishedAt >= :from')
+           ->setParameter('from', new \DateTime($from));
+    }
+
+    if ($to) {
+        $qb->andWhere('n.publishedAt <= :to')
+           ->setParameter('to', new \DateTime($to));
+    }
+
+    return $qb->orderBy('n.publishedAt', 'DESC')
+              ->getQuery()
+              ->getResult();
+}
+```
 
 *Explicación de comandos clave:*
 1. $request->query->get('q', '') → Obtiene parámetro de búsqueda ?q=texto de la URL.
@@ -395,7 +428,7 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/CommentController.php
 #[Route('/news/{slug}/comment', name: 'app_comment_create', methods: ['POST'])]
 #[IsGranted('ROLE_USER')]
@@ -423,7 +456,7 @@ public function create(Request $request, News $news): Response
 
     return $this->redirectToRoute('app_news_show', ['slug' => $news->getSlug()]);
 }
-
+```
 
 *Explicación de comandos clave:*
 1. #[IsGranted('ROLE_USER')] → Solo usuarios autenticados pueden comentar.
@@ -473,37 +506,82 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/ReportController.php
+
+// Ruta para denunciar (reportar) un comentario específico
+// El parámetro {id} identifica el comentario a denunciar
+// Solo usuarios autenticados (ROLE_USER) pueden acceder
 #[Route('/comment/{id}/report', name: 'app_report_comment', methods: ['POST'])]
 #[IsGranted('ROLE_USER')]
 public function reportComment(Request $request, Comment $comment): Response
 {
-    // CU08: Denunciar comentario
+    
+    // Este método permite a un usuario enviar una denuncia
+    // sobre un comentario que considere inapropiado.
+    // Se crea una entidad Report asociada al comentario y al usuario actual.
+
+    // 1. Crear una nueva instancia del reporte
     $report = new Report();
+
+    // 2. Crear el formulario de denuncia usando ReportFormType
+    //    Este formulario contendrá los campos "reason" y "description"
     $form = $this->createForm(ReportFormType::class, $report);
+
+    // 3. Procesar la solicitud HTTP (POST)
+    //    Symfony asocia los datos del formulario enviados por el usuario
+    //    a la entidad $report.
     $form->handleRequest($request);
 
+    // 4. Validar si el formulario fue enviado y sus datos son válidos
     if ($form->isSubmitted() && $form->isValid()) {
-        // Asociar reporte a comentario y usuario
+
+        // --- Asociaciones lógicas del reporte ---
+
+        // Enlazar el reporte con el comentario denunciado
         $report->setTargetComment($comment);
+
+        // Enlazar el reporte con el usuario autenticado que lo envía
         $report->setReporter($this->getUser());
+
+        // Guardar el motivo seleccionado en el formulario
         $report->setReason($form->get('reason')->getData());
+
+        // Guardar la descripción detallada de la denuncia
         $report->setDescription($form->get('description')->getData());
+
+        // Registrar la fecha y hora en que se crea la denuncia
         $report->setCreatedAt(new \DateTimeImmutable());
+
+        // Estado inicial del reporte: aún no resuelto
         $report->setResolved(false);
-        
-        // Persistir reporte
+
+        // --- Persistencia en base de datos ---
+
+        // Registrar la nueva entidad Report en el EntityManager
         $this->entityManager->persist($report);
+
+        // Ejecutar la escritura en la base de datos
         $this->entityManager->flush();
-        
+
+        // --- Respuesta al usuario ---
+
+        // Agregar un mensaje flash que se mostrará en la interfaz
         $this->addFlash('info', 'Denuncia enviada a moderación');
-        return $this->redirectToRoute('app_news_show', ['slug' => $comment->getNews()->getSlug()]);
+
+        // Redirigir al usuario de vuelta a la noticia donde estaba el comentario
+        return $this->redirectToRoute('app_news_show', [
+            'slug' => $comment->getNews()->getSlug()
+        ]);
     }
 
-    return $this->redirectToRoute('app_news_show', ['slug' => $comment->getNews()->getSlug()]);
+    // Si el formulario no es válido o no se envió correctamente,
+    // simplemente redirigimos al detalle de la noticia sin guardar nada.
+    return $this->redirectToRoute('app_news_show', [
+        'slug' => $comment->getNews()->getSlug()
+    ]);
 }
-
+```
 
 *Explicación de comandos clave:*
 1. #[IsGranted('ROLE_USER')] → Solo usuarios registrados pueden denunciar.
@@ -525,7 +603,7 @@ public function reportComment(Request $request, Comment $comment): Response
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/CommentController.php
 #[Route('/comment/{id}/vote', name: 'app_comment_vote', methods: ['POST'])]
 #[IsGranted('ROLE_USER')]
@@ -575,7 +653,7 @@ public function calculateCommentScore(Comment $comment): int
 
     return $result['totalScore'] ?? 0;
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $request->request->getInt('value') → Obtiene el valor del voto (+1 o -1) del POST.
@@ -597,7 +675,7 @@ public function calculateCommentScore(Comment $comment): int
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/NewsController.php
 #[Route('/news/{id}/rate', name: 'app_news_rate', methods: ['POST'])]
 #[IsGranted('ROLE_USER')]
@@ -652,7 +730,7 @@ public function calculateAverageScore(News $news): float
 
     return $result['avgScore'] ? (float) $result['avgScore'] : 0;
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $request->request->getInt('score') → Obtiene calificación (1-5) del POST.
@@ -674,7 +752,7 @@ public function calculateAverageScore(News $news): float
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/Admin/NewsletterController.php
 #[Route('/admin/newsletter/subscribers', name: 'app_newsletter_subscribers')]
 #[IsGranted('ROLE_ADMIN')]
@@ -738,7 +816,7 @@ public function send(Request $request, MailerInterface $mailer): Response
     $this->addFlash('success', sprintf('Boletín enviado a %d suscriptores', count($subscribers)));
     return $this->redirectToRoute('app_newsletter_subscribers');
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $this->subscriberRepository->findAll() → Obtiene lista de todos los suscriptores.
@@ -762,7 +840,7 @@ public function send(Request $request, MailerInterface $mailer): Response
 
 *Flujo y código (CREATE):*
 
-php
+```php
 // src/Controller/Admin/NewsManagementController.php
 #[Route('/admin/news', name: 'app_news_admin_index')]
 #[IsGranted('ROLE_EDITOR')]
@@ -889,7 +967,7 @@ private function generateSlug(string $title): string
     return strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', preg_replace('/[áéíóú]/', 
         ['a', 'e', 'i', 'o', 'u'], strtolower($title))), '-'));
 }
-
+```
 
 *Explicación de comandos clave:*
 1. #[IsGranted('ROLE_EDITOR')] → Solo editores o admins pueden acceder.
@@ -930,7 +1008,7 @@ twig
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/Admin/CategoryController.php
 #[Route('/admin/categories', name: 'app_category_index')]
 #[IsGranted('ROLE_ADMIN')]
@@ -1008,7 +1086,7 @@ public function delete(Request $request, Category $category): Response
 
     return $this->redirectToRoute('app_category_index');
 }
-
+```
 
 *Explicación de comandos clave:*
 1. #[IsGranted('ROLE_ADMIN')] → Solo administradores pueden gestionar categorías.
@@ -1029,7 +1107,7 @@ public function delete(Request $request, Category $category): Response
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/Admin/TagController.php
 #[Route('/admin/tags', name: 'app_tag_index')]
 #[IsGranted('ROLE_ADMIN')]
@@ -1096,7 +1174,7 @@ public function delete(Request $request, Tag $tag): Response
 
     return $this->redirectToRoute('app_tag_index');
 }
-
+```
 
 *Explicación de comandos clave:*
 - Similar a CU13 (categorías).
@@ -1114,7 +1192,7 @@ public function delete(Request $request, Tag $tag): Response
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/Admin/ModerationController.php
 #[Route('/admin/moderation', name: 'app_moderation_index')]
 #[IsGranted('ROLE_ADMIN')]
@@ -1203,7 +1281,7 @@ public function approveReport(Request $request, Report $report): Response
 
     return $this->redirectToRoute('app_moderation_index');
 }
-
+```
 
 *Explicación de comandos clave:*
 1. $this->reportRepository->createQueryBuilder('r')->where('r.resolved = :resolved', false) → Obtiene reportes pendientes.
@@ -1224,7 +1302,7 @@ public function approveReport(Request $request, Report $report): Response
 
 *Flujo y código:*
 
-php
+```php
 // src/Controller/NewsController.php
 #[Route('/news/{slug}', name: 'app_news_show')]
 public function show(Request $request, News $news): Response
@@ -1267,7 +1345,7 @@ public function show(Request $request, News $news): Response
         'userRating' => $userRating,
     ]);
 }
-
+```
 
 *Explicación de comandos clave:*
 1. News $news → ParamConverter inyecta automáticamente por slug.
@@ -1323,52 +1401,53 @@ twig
         {% endif %}
     </section>
 </article>
-
+```
 
 ---
 
 ## Resumen de Comandos y Patrones Transversales
 
 ### EntityManager (Persistencia)
-php
+```php
 $entityManager->persist($entity);     // Marca para inserción/actualización
 $entityManager->flush();              // Ejecuta cambios en BD
 $entityManager->remove($entity);      // Marca para eliminación
-
+```
 
 ### Formularios
-php
+```php
 $form = $this->createForm(FormType::class, $entity);
 $form->handleRequest($request);       // Procesa POST/GET
 if ($form->isSubmitted() && $form->isValid()) { /* guardar */ }
-
+```
 
 ### Queries con QueryBuilder
-php
+```php
 $queryBuilder = $repo->createQueryBuilder('alias')
     ->where('alias.field = :value')
     ->setParameter('value', $value)
     ->orderBy('alias.field', 'DESC')
     ->getQuery()
     ->getResult();
-
+```
 
 ### Seguridad
-php
+```php
 #[IsGranted('ROLE_USER')]                     // Verifica rol
 $this->getUser()                              // Usuario actual
 $this->isGranted('ROLE_ADMIN')               // Comprobación en código
 $this->createAccessDeniedException()          // Lanza excepción 403
-
+```
 
 ### Redirecciones y Respuestas
-php
+```php
 return $this->redirectToRoute('route_name');
 return $this->render('template.html.twig', ['var' => $value]);
 return $this->json(['data' => $value]);
-
+```
 
 ### Flash Messages
-php
+```php
 $this->addFlash('success', 'Operación exitosa');
 $this->addFlash('error', 'Ocurrió un error');
+```
