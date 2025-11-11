@@ -1194,101 +1194,118 @@ public function delete(Request $request, Tag $tag): Response
 
 ```php
 // src/Controller/Admin/ModerationController.php
+
+// Ruta para ver todos los reportes pendientes de moderación
 #[Route('/admin/moderation', name: 'app_moderation_index')]
+// Solo accesible para usuarios con rol ROLE_ADMIN
 #[IsGranted('ROLE_ADMIN')]
 public function index(Request $request, PaginatorInterface $paginator): Response
 {
-    // CU16: Listar reportes pendientes
+    // Este método muestra un listado paginado de todos los reportes
+    // que aún no han sido resueltos por el equipo de moderación.
+
+    // Construir la consulta para obtener solo reportes no resueltos
     $queryBuilder = $this->reportRepository->createQueryBuilder('r')
         ->where('r.resolved = :resolved')
         ->setParameter('resolved', false)
         ->orderBy('r.createdAt', 'DESC');
 
-    $reports = $paginator->paginate($queryBuilder->getQuery(), $request->query->getInt('page', 1), 10);
+    // Paginar los resultados (10 reportes por página)
+    $reports = $paginator->paginate(
+        $queryBuilder->getQuery(),
+        $request->query->getInt('page', 1),
+        10
+    );
 
-    return $this->render('admin/moderation/index.html.twig', ['reports' => $reports]);
+    // Renderizar la vista de administración con los reportes
+    return $this->render('admin/moderation/index.html.twig', [
+        'reports' => $reports,
+    ]);
 }
 
+// Ruta para revisar un reporte específico
 #[Route('/admin/moderation/report/{id}', name: 'app_moderation_review')]
+// Solo accesible para administradores
 #[IsGranted('ROLE_ADMIN')]
 public function review(Request $request, Report $report): Response
 {
-    // CU16: Revisar reporte específico
+    // Muestra los detalles del reporte para que el administrador lo evalúe
+
     return $this->render('admin/moderation/review.html.twig', [
         'report' => $report,
     ]);
 }
 
-#[Route('/admin/moderation/comment/{id}/hide', name: 'app_comment_hide', methods: ['POST'])]
-#[IsGranted('ROLE_ADMIN')]
-public function hideComment(Request $request, Comment $comment): Response
-{
-    // CU16: Ocultar comentario reportado
-    if ($this->isCsrfTokenValid('hide'.$comment->getId(), $request->request->get('_token'))) {
-        $comment->setVisible(false);
-        $this->entityManager->flush();
-
-        // Resolver reporte
-        $report = $this->reportRepository->findOneBy(['targetComment' => $comment, 'resolved' => false]);
-        if ($report) {
-            $report->setResolved(true);
-            $report->setResolutionReason('Comentario ocultado');
-            $this->entityManager->flush();
-        }
-
-        $this->addFlash('success', 'Comentario ocultado');
-    }
-
-    return $this->redirectToRoute('app_moderation_index');
-}
-
+// Ruta para eliminar un comentario denunciado
 #[Route('/admin/moderation/comment/{id}/delete', name: 'app_comment_delete_admin', methods: ['POST'])]
+// Solo accesible para administradores
 #[IsGranted('ROLE_ADMIN')]
 public function deleteComment(Request $request, Comment $comment): Response
 {
     // CU16: Eliminar comentario
+    // Verifica el token CSRF para evitar acciones maliciosas
     if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
+        // Obtener la noticia asociada (opcional, si se quiere redirigir o mostrar contexto)
         $news = $comment->getNews();
+
+        // Eliminar el comentario de la base de datos
         $this->entityManager->remove($comment);
         $this->entityManager->flush();
 
-        // Resolver reportes
-        $reports = $this->reportRepository->findBy(['targetComment' => $comment, 'resolved' => false]);
+        // Buscar todos los reportes no resueltos asociados al comentario
+        $reports = $this->reportRepository->findBy([
+            'targetComment' => $comment,
+            'resolved' => false
+        ]);
+
+        // Marcar cada reporte como resuelto y registrar la razón
         foreach ($reports as $report) {
             $report->setResolved(true);
             $report->setResolutionReason('Comentario eliminado');
         }
+
+        // Guardar los cambios en los reportes
         $this->entityManager->flush();
 
+        // Mostrar mensaje de éxito
         $this->addFlash('success', 'Comentario eliminado');
     }
 
+    // Redirigir al listado de moderación
     return $this->redirectToRoute('app_moderation_index');
 }
 
+// Ruta para aprobar un reporte (desestimarlo)
 #[Route('/admin/moderation/report/{id}/approve', name: 'app_report_approve', methods: ['POST'])]
+// Solo accesible para administradores
 #[IsGranted('ROLE_ADMIN')]
 public function approveReport(Request $request, Report $report): Response
 {
-    // CU16: Desestimar reporte (comentario es válido)
+    // CU16: Desestimar reporte (comentario válido)
+    // Verifica el token CSRF para seguridad
     if ($this->isCsrfTokenValid('approve'.$report->getId(), $request->request->get('_token'))) {
+        // Marcar el reporte como resuelto y registrar la razón
         $report->setResolved(true);
         $report->setResolutionReason('Aprobado - No viola normas');
+
+        // Guardar los cambios
         $this->entityManager->flush();
 
+        // Mostrar mensaje de éxito
         $this->addFlash('success', 'Reporte desestimado');
     }
 
+    // Redirigir al listado de moderación
     return $this->redirectToRoute('app_moderation_index');
 }
+
 ```
 
 *Explicación de comandos clave:*
 1. $this->reportRepository->createQueryBuilder('r')->where('r.resolved = :resolved', false) → Obtiene reportes pendientes.
-2. $comment->setVisible(false) → Oculta comentario sin eliminarlo.
-3. $report->setResolved(true) → Marca reporte como atendido.
-4. $this->reportRepository->findBy(['targetComment' => $comment, 'resolved' => false]) → Obtiene todos los reportes de un comentario.
-5. $this->entityManager->remove($comment) → Elimina comentario permanentemente.
+2. $report->setResolved(true) → Marca reporte como atendido.
+3. $this->reportRepository->findBy(['targetComment' => $comment, 'resolved' => false]) → Obtiene todos los reportes de un comentario.
+4. $this->entityManager->remove($comment) → Elimina comentario permanentemente.
 
 ---
 
