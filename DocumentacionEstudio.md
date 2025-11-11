@@ -234,6 +234,28 @@ User 1 ----* NewsRating
 User 1 ----* CommentVote
 ```
 
+Con los archivos de mi proyecto, requiero que creas todos los flujos de caso de uso posible explicando que partes del codigo intervienen y como interactuan.
+Escribirlo en el archivo CasoDeUso.md
+
+Lista de casos de uso creados en este proyecto:
+CU01: Registrarse
+CU02: Autenticarse
+CU04: Editar perfil
+CU05: Explorar noticias
+CU06: Buscar contenido
+CU07: Comentar contenido
+CU08: Denunciar
+CU09: Votar comentario
+CU10: Votar noticia
+CU11: Suscribirse al boletín
+CU12: Gestión de noticias
+CU13: Editar categorías
+CU14: Editar etiquetas
+CU16: Moderar comentarios
+CU20: Ver noticia
+
+
+
 ## 🛠️ Implementación Técnica
 
 ### Estructura MVC
